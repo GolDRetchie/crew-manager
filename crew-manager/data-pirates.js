@@ -26,18 +26,18 @@
 
 const PIRATES = [
 
-  // --- Captains ------------------------------------------------------------
-  { n:"Luffy",         r:"Captain", p:8, d:8, s:8, c:"Straw Hat Pirates",  sp:["Gum Gum Pistol","Gum Gum Bazooka","Red Hawk"] },
-  { n:"Whitebeard",    r:"Captain", p:8, d:8, s:8, c:"Whitebeard Pirates", sp:["Gura Gura no Mi","Quake Punch"] },
-  { n:"Big Mom",       r:"Captain", p:8, d:8, s:8, c:"Big Mom Pirates",    sp:["Soul Pocus","Maser Cannon"] },
-  { n:"Kaido",         r:"Captain", p:8, d:8, s:8, c:"Beasts Pirates",     sp:["Thunder Bagua","Boro Breath"] },
-  { n:"Blackbeard",    r:"Captain", p:8, d:8, s:8, c:"Blackbeard Pirates", sp:["Black Hole","Liberation"] },
-  { n:"Doflamingo",    r:"Captain", p:8, d:8, s:8, c:"Donquixote Pirates", sp:["Overheat","Birdcage"] },
-  { n:"Shanks",        r:"Captain", p:8, d:8, s:8, c:"Red Hair Pirates",   sp:["Divine Departure","Haki Slash"] },
-  { n:"Trafalgar Law", r:"Captain", p:8, d:8, s:8, c:"Heart Pirates",      sp:["Room: Shambles","Gamma Knife"] },
-  { n:"Eustass Kid",   r:"Captain", p:8, d:8, s:8, c:"Kid Pirates",        sp:["Punk Gibson","Repel","Punk Gibson"] },
-  { n:"Buggy",         r:"Captain", p:8, d:8, s:8, c:"Buggy Pirates",      sp:["Chop-Chop Cannon","Muggy Ball"] },
-
+// --- Captains ------------------------------------------------------------
+  { n:"Luffy",         r:"Captain", img:"luffysmile.jpg", p:8, d:8, s:8, c:"Straw Hat Pirates",  sp:["Gum Gum Pistol","Gum Gum Bazooka","Red Hawk"] },
+  { n:"Whitebeard",    r:"Captain", img:"whitebeard.jpg", p:8, d:8, s:8, c:"Whitebeard Pirates", sp:["Gura Gura no Mi","Quake Punch"] },
+  { n:"Big Mom",       r:"Captain", img:"bigmom.jpg",     p:8, d:8, s:8, c:"Big Mom Pirates",    sp:["Soul Pocus","Maser Cannon"] },
+  { n:"Kaido",         r:"Captain", img:"kaido.jpg",      p:8, d:8, s:8, c:"Beasts Pirates",     sp:["Thunder Bagua","Boro Breath"] },
+  { n:"Blackbeard",    r:"Captain", img:"blackbeard.jpg", p:8, d:8, s:8, c:"Blackbeard Pirates", sp:["Black Hole","Liberation"] },
+  { n:"Doflamingo",    r:"Captain", img:"doflamingo.jpg", p:8, d:8, s:8, c:"Donquixote Pirates", sp:["Overheat","Birdcage"] },
+  { n:"Shanks",        r:"Captain", img:"Shanks.jpg",     p:8, d:8, s:8, c:"Red Hair Pirates",   sp:["Divine Departure","Haki Slash"] },
+  { n:"Trafalgar Law", r:"Captain", img:"law.jpg",        p:8, d:8, s:8, c:"Heart Pirates",      sp:["Room: Shambles","Gamma Knife"] },
+  { n:"Eustass Kid",   r:"Captain", img:"eustass.jpg",    p:8, d:8, s:8, c:"Kid Pirates",        sp:["Punk Gibson","Repel","Punk Gibson"] },
+  { n:"Buggy",         r:"Captain", img:"Buggy.jpg",      p:8, d:8, s:8, c:"Buggy Pirates",      sp:["Chop-Chop Cannon","Muggy Ball"] },
+  
   // --- Swordsman -----------------------------------------------------------
   { n:"Zoro",              r:"Swordsman", p:8, d:7, s:7, c:"Straw Hat Pirates",  sp:["Santoryu Ogi","King of Hell"] },
   { n:"King",              r:"Swordsman", p:8, d:8, s:8, c:"Beasts Pirates",     sp:["Flame Dragon King"] },

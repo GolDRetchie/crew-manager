@@ -1,0 +1,94 @@
+/* ====================================================================
+   mp-fit.css — "past altijd op het scherm" laag voor de ONLINE competitie.
+
+   ALLES is gescoped op  body[data-screen="screen-competition"]  zodat het
+   single-player (screen-crew / screen-market / screen-training) nooit kan
+   raken — die draaien op een andere data-screen-waarde.
+
+   Laad dit ALS LAATSTE stylesheet (ná mp.css) zodat deze online-laag wint
+   van de algemene regels, zonder !important.
+
+   Model:
+   - #screen-competition vult exact de schermhoogte (100dvh), geen scroll.
+   - kop (.cw-top) + schip-strip (.cw-ship) staan vast.
+   - .cw-main vult de rest:
+       PORTRET  -> kolom: schip boven, bench eronder.
+       LIGGEND  -> rij:   schip links, bench ernaast.
+   - Het schip wordt door mp-crew.js (fitCrew) op de juiste maat gezet en
+     de slot-kaartjes schalen mee via --cs-slot-scale.
+   ==================================================================== */
+
+/* geen pagina-scroll op dit scherm; .app vult exact de schermhoogte */
+body[data-screen="screen-competition"]{ overflow:hidden; }
+
+body[data-screen="screen-competition"] .app{
+  max-width:none; width:100%;
+  height:100dvh; min-height:0;
+  padding:8px 12px; margin:0;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+
+body[data-screen="screen-competition"] .screen.is-active{
+  display:flex; flex:1 1 auto; min-height:0;
+}
+
+body[data-screen="screen-competition"] #cp-content.wl-wrap{
+  max-width:none; width:100%; margin:0; padding:0;
+  flex:1 1 auto; min-height:0;
+  display:flex; flex-direction:column;
+}
+
+/* vaste kop + strip */
+body[data-screen="screen-competition"] .cw-top{
+  flex:0 0 auto; margin-bottom:8px; padding-bottom:8px;
+}
+body[data-screen="screen-competition"] .cw-ship{
+  flex:0 0 auto; margin:6px 0;
+}
+
+/* flexibel middenstuk */
+body[data-screen="screen-competition"] .cw-main{
+  flex:1 1 auto; min-height:0; margin:0;
+  display:flex; gap:12px; align-items:stretch; flex-wrap:nowrap;
+}
+
+/* schip-kolom: mp.css' vaste 500px-hoogte uit; fitCrew zet de exacte maat */
+body[data-screen="screen-competition"] .ship-col{
+  height:auto; max-width:none; margin:0 auto; align-self:center;
+  flex:1 1 auto; min-height:0; position:relative;
+}
+body[data-screen="screen-competition"] .ship-col svg{
+  position:absolute; inset:0; width:100%; height:100%;
+}
+
+/* slot-kaartjes schalen mee met de schiphoogte (var gezet door fitCrew) */
+body[data-screen="screen-competition"] .slot{
+  transform:translate(-50%,-50%) scale(var(--cs-slot-scale,1));
+  transform-origin:center center;
+}
+
+/* bench: scrollt intern als er te veel bankplekken zijn -> schip blijft heel */
+body[data-screen="screen-competition"] .bench-col{
+  display:flex; flex-direction:column; min-height:0;
+}
+body[data-screen="screen-competition"] .bench{
+  flex:1 1 auto; min-height:0; overflow-y:auto;
+}
+body[data-screen="screen-competition"] .bench-note{ flex:0 0 auto; }
+
+/* ---- PORTRET: schip boven, bench eronder ---- */
+@media (orientation:portrait){
+  body[data-screen="screen-competition"] .cw-main{ flex-direction:column; }
+  body[data-screen="screen-competition"] .bench-col{
+    flex:0 1 auto; max-height:40%;
+  }
+}
+
+/* ---- LIGGEND: bench naast het schip ---- */
+@media (orientation:landscape){
+  body[data-screen="screen-competition"] .cw-main{ flex-direction:row; }
+  body[data-screen="screen-competition"] .ship-col{ height:100%; }
+  body[data-screen="screen-competition"] .bench-col{
+    flex:0 0 clamp(180px, 30%, 280px); align-self:stretch;
+  }
+}

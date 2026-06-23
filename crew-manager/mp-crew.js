@@ -245,6 +245,7 @@ function canAfford(){
                    : "Drag a crew member onto a post. Drop on a filled post to swap. Only your 9 on deck fight.");
 
     content().innerHTML =
+      '<div class="cs-fit">' +
       '<div class="cw-top">' +
         '<div class="cw-id"><div class="cw-av" style="background:' + col(d.captain) + '">' + ini(d.captain) + '</div>' +
           '<div><div class="cw-crew">' + esc(d.crewName) + '</div><div class="cw-cap">Captain ' + esc(d.captain) + '</div></div></div>' +
@@ -257,6 +258,7 @@ function canAfford(){
       '<div class="ship-col">' + SHIP + capSlot + deckHtml + '</div>' +
         '<div class="bench-col"><div class="bench"><div class="bench-title">Bench</div>' + benchHtml +
           '</div><div class="bench-note">' + note + '</div></div>' +
+          '</div>' +
       '</div>';
 
     el("cs-back").addEventListener("click", function (){ if (typeof window.cmOpenLeague === "function") window.cmOpenLeague(C.id); });
@@ -268,6 +270,46 @@ function canAfford(){
     var upg = el("cs-upg");     if (upg) upg.addEventListener("click", doUpgrade);
     var brush = el("cs-brush"); if (brush) brush.addEventListener("click", openEditor);
     content().querySelectorAll("[data-drag]").forEach(function (e){ e.addEventListener("pointerdown", onDragStart); });
+    requestAnimationFrame(fitCrew);
+    requestAnimationFrame(function (){ requestAnimationFrame(fitCrew); });
+  }
+
+  /* ---- past het schip + de slots op de beschikbare schermhoogte ---- */
+  function fitCrew(){
+    var root = content(); if (!root) return;
+    var main = root.querySelector(".cw-main");
+    var col  = root.querySelector(".ship-col");
+    if (!main || !col) return;
+
+    var landscape = false;
+    try { landscape = window.matchMedia("(orientation: landscape)").matches; } catch (e) {}
+    var st  = getComputedStyle(main);
+    var gap = parseFloat(st.gap || st.columnGap || st.rowGap || "0") || 0;
+    var mrect = main.getBoundingClientRect();
+    var bench = root.querySelector(".bench-col");
+    var brect = bench ? bench.getBoundingClientRect() : { width: 0, height: 0 };
+
+    var availW, availH;
+    if (landscape){ availW = mrect.width - brect.width - gap;  availH = mrect.height; }
+    else          { availW = mrect.width;                      availH = mrect.height - brect.height - gap; }
+    if (availW < 40 || availH < 40) return;
+
+    // schip-verhouding uit de SVG viewBox halen (val terug op 360x500)
+    var AR = 360 / 500, svg = col.querySelector("svg");
+    if (svg){ var vb = svg.getAttribute("viewBox"); if (vb){ var p = vb.split(/[\s,]+/); var vw = +p[2], vh = +p[3]; if (vw > 0 && vh > 0) AR = vw / vh; } }
+
+    var w = availW, h = w / AR;
+    if (h > availH){ h = availH; w = h * AR; }
+    w = Math.max(150, Math.floor(w));
+    h = Math.max(150, Math.floor(h));
+
+    col.style.flex   = "0 0 auto";
+    col.style.width  = w + "px";
+    col.style.height = h + "px";
+    col.style.margin = "0 auto";
+
+    var scale = Math.max(0.60, Math.min(1, h / 500));
+    root.style.setProperty("--cs-slot-scale", scale.toFixed(3));
   }
 
   /* ---- drag & drop (posities; index-based) ---- */
@@ -513,4 +555,10 @@ function canAfford(){
     ].join("\n");
     document.head.appendChild(css);
   }
+
+  /* herbereken bij draaien/resizen van het scherm */
+  var fitT = null;
+  function onResize(){ if (fitT) cancelAnimationFrame(fitT); fitT = requestAnimationFrame(fitCrew); }
+  window.addEventListener("resize", onResize);
+  window.addEventListener("orientationchange", onResize);
 })();
