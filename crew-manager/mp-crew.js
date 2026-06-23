@@ -178,6 +178,11 @@
     return b;
   }
 
+  function ccm(m){
+    return window.CrewCard ? CrewCard.member(m)
+      : ('<div class="cc-nm">' + esc(m && m.name || "") + '</div>');
+  }
+
   function deckSlot(i){
     var posSet = GENPOS[C.lineup.deck.length] || GENPOS[9];
     var pos = posSet[i] || [50,50];
@@ -187,9 +192,7 @@
       var m = C.byName[name] || {};
       var tired = (m.cond != null && m.cond < 80) ? '<span class="cs-tired" title="Tired (< 80)">\u26A1</span>' : "";
       return '<div class="slot filled" style="' + style + '" data-drop="deck:' + i + '" data-drag="deck:' + i + '">' +
-        tired +
-        '<div class="slot-nm"><span class="dot" style="background:' + col(name) + '"></span>' + esc(name) + '</div>' +
-        '<div class="slot-role">' + esc(m.role || "") + '</div></div>';
+        tired + ccm({ name: name, role: m.role }) + '</div>';
     }
     return '<div class="slot empty" style="' + style + '" data-drop="deck:' + i + '">' +
       '<div class="slot-plus">+</div></div>';
@@ -198,14 +201,13 @@
     var name = C.lineup.bench[i];
     if (name){
       var m = C.byName[name] || {};
-      return '<div class="b-slot" data-drop="bench:' + i + '" data-drag="bench:' + i + '">' +
-        '<div class="b-av" style="background:' + col(name) + '">' + ini(name) + '</div>' +
-        '<div><div class="b-nm">' + esc(name) + '</div><div class="b-role">' + esc((m.role || "") + " \u00b7 rests to full") + '</div></div></div>';
+      return '<div class="slot filled cc-bench" data-drop="bench:' + i + '" data-drag="bench:' + i + '">' +
+        ccm({ name: name, role: m.role }) + '</div>';
     }
-    return '<div class="b-slot empty" data-drop="bench:' + i + '">Empty bench slot</div>';
+    return '<div class="slot empty cc-bench" data-drop="bench:' + i + '"><div class="slot-plus">+</div></div>';
   }
 
-function canAfford(){
+  function canAfford(){
     var cur = (C.ship && C.ship.shipTier) || 1, info = NEXT_TIER[cur + 1];
     if (!info) return false;
     var price = crewHasShipwright() ? Math.round(info.price * (1 - SHIPWRIGHT_DISCOUNT)) : info.price;
@@ -233,8 +235,7 @@ function canAfford(){
 
     var capSlot =
       '<div class="slot cap filled" style="left:50%; top:8%">' +
-        '<div class="slot-av" style="background:' + col(d.captain) + '">' + ini(d.captain) + '</div>' +
-        '<div class="slot-nm">' + esc(d.captain) + '</div><div class="slot-role">Captain</div></div>';
+        ccm({ name: d.captain, role: "Captain" }) + '</div>';
 
     var deckHtml = ""; for (var i = 0; i < deckN; i++) deckHtml += deckSlot(i);
     var benchHtml = ""; for (var b = 0; b < benchN; b++) benchHtml += benchSlot(b);
@@ -256,7 +257,8 @@ function canAfford(){
       shipStripHtml() +
       '<div class="cw-main">' +
       '<div class="ship-col">' + SHIP + capSlot + deckHtml + '</div>' +
-        '<div class="bench-col"><div class="bench"><div class="bench-title">Bench</div>' + benchHtml +
+        '<div class="bench-col"><div class="bench"><div class="bench-title">Bench</div>' +
+          '<div class="cc-benchwrap">' + benchHtml + '</div>' +
           '</div><div class="bench-note">' + note + '</div></div>' +
           '</div>' +
       '</div>';

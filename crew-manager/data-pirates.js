@@ -37,7 +37,7 @@ const PIRATES = [
   { n:"Trafalgar Law", r:"Captain", img:"law.jpg",        p:8, d:8, s:8, c:"Heart Pirates",      sp:["Room: Shambles","Gamma Knife"] },
   { n:"Eustass Kid",   r:"Captain", img:"eustass.jpg",    p:8, d:8, s:8, c:"Kid Pirates",        sp:["Punk Gibson","Repel","Punk Gibson"] },
   { n:"Buggy",         r:"Captain", img:"Buggy.jpg",      p:8, d:8, s:8, c:"Buggy Pirates",      sp:["Chop-Chop Cannon","Muggy Ball"] },
-  
+
   // --- Swordsman -----------------------------------------------------------
   { n:"Zoro",              r:"Swordsman", p:8, d:7, s:7, c:"Straw Hat Pirates",  sp:["Santoryu Ogi","King of Hell"] },
   { n:"King",              r:"Swordsman", p:8, d:8, s:8, c:"Beasts Pirates",     sp:["Flame Dragon King"] },
@@ -50,7 +50,7 @@ const PIRATES = [
   { n:"Sabo",              r:"Swordsman", p:8, d:7, s:8, c:"Free Agent", sp:["Dragon Claw Fist","Fire Fist"] },
   { n:"Cavendish",         r:"Swordsman", p:7, d:6, s:8, c:"Free Agent", sp:["Swan Lake"] },
   { n:"Hakuba",            r:"Swordsman", p:7, d:6, s:8, c:"Free Agent", sp:["Swan Lake"] },
-  { n:"Loki",              r:"Swordsman", alt:["Crewmate"], cap:true, p:8, d:8, s:8, c:"Free Agent", sp:["Sun God Strike"] },
+  { n:"Loki",              r:"Swordsman", img:"loki.jpg", alt:["Crewmate"], cap:true, p:8, d:8, s:8, c:"Free Agent", sp:["Sun God Strike"] },
   { n:"Mr 1. Daz Bones",   r:"Swordsman", alt:["Crewmate"], p:7, d:6, s:7, c:"Free Agent", sp:["Spartan Slash"] },
   { n:"Kozuki Oden",       r:"Swordsman", alt:["Chef"], p:7, d:6, s:7, c:"Free Agent", sp:["Togen Totsuka","Paradise Totsuka"] },
   { n:"Kozuki Momonosuke", r:"Swordsman", alt:["Crewmate"], p:6, d:6, s:6, c:"Free Agent", sp:["Thunder Bagua"] },
@@ -115,7 +115,7 @@ const PIRATES = [
   { n:"Tom",               r:"Shipwright", p:6, d:7, s:5, c:"Free Agent",  sp:[] },
   { n:"Iceberg",           r:"Shipwright", p:4, d:5, s:6, c:"Free Agent",  sp:[] },
   { n:"Paulie",            r:"Shipwright", p:6, d:5, s:4, c:"Free Agent",  sp:[] },
-  { n:"Kaku",              r:"Crewmate", p:5, d:5, s:7, c:"Free Agent", sp:["Rankyaku Lanceo","Tempest kick"] },
+  { n:"Kaku",              r:"Crewmate",   p:5, d:5, s:7, c:"Free Agent", sp:["Rankyaku Lanceo","Tempest kick"] },
   { n:"Rob Lucci",         r:"Shipwright", p:6, d:7, s:6, c:"Free Agent", sp:["Ten Finger Pistol","Tempest Kick"] },
   { n:"Senor Pink",        r:"Shipwright", p:5, d:5, s:5, c:"Donquixote Pirates", sp:["Hard Tackle","Suplex"] },
 
