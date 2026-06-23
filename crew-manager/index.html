@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#0b2533" />
+  <link rel="manifest" href="manifest.json?v=2" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="OPM" />
+  <title>Crew Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Spectral:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=23" />
+  <link rel="stylesheet" href="auth.css?v=1" />
+  <link rel="stylesheet" href="menu.css?v=1" />
+  <link rel="stylesheet" href="admin.css?v=1" />
+  <link rel="stylesheet" href="mp.css?v=1" />
+  <link rel="stylesheet" href="mp-online.css?v=2" />
+  <link rel="stylesheet" href="mp-market.css?v=1" />
+  <link rel="stylesheet" href="home.css?v=1" />
+  <link rel="stylesheet" href="boot.css?v=1" />
+
+</head>
+<body>
+
+  <!-- ============ BOOT SPLASH (One Piece Manager) ============ -->
+  <div id="boot-splash" class="boot-splash">
+    <div class="boot-sea"><svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,30 C120,10 240,50 360,30 C480,10 600,50 720,30 C840,10 960,50 1080,30 C1200,10 1320,50 1440,30 L1440,60 L0,60 Z" fill="#0b2533"/></svg></div>
+    <div class="boot-in">
+      <div class="boot-title">ONE PIECE<br />MANAGER</div>
+      <div class="boot-pose" id="boot-pose">
+        <svg class="lp" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs><radialGradient id="lpGlass" cx="40%" cy="34%" r="70%"><stop offset="0%" stop-color="#eaf6fa"/><stop offset="55%" stop-color="#bfe0ec"/><stop offset="100%" stop-color="#7fa8b8"/></radialGradient></defs>
+          <rect x="6" y="84" width="108" height="22" rx="9" fill="#6b4a26" stroke="#3a2708" stroke-width="2"/>
+          <rect x="6" y="84" width="108" height="7" rx="6" fill="#8a5a2b"/>
+          <line x1="16" y1="95" x2="104" y2="95" stroke="#f1e2be" stroke-width="1.4" stroke-dasharray="2 5" opacity=".6"/>
+          <rect x="45" y="78" width="7" height="12" rx="2" fill="#9a6b1e"/>
+          <rect x="68" y="78" width="7" height="12" rx="2" fill="#9a6b1e"/>
+          <circle cx="60" cy="52" r="33" fill="none" stroke="#9a6b1e" stroke-width="6"/>
+          <circle cx="60" cy="52" r="33" fill="none" stroke="#f4cf6a" stroke-width="2"/>
+          <circle cx="60" cy="52" r="29" fill="url(#lpGlass)"/>
+          <g class="lp-needle"><polygon points="60,30 54,52 66,52" fill="#a3331f"/><polygon points="60,74 54,52 66,52" fill="#f1e2be" stroke="#9a6b1e" stroke-width="1"/></g>
+          <circle cx="60" cy="52" r="4.5" fill="#9a6b1e"/>
+          <path d="M44 38 A20 20 0 0 1 70 33" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity=".5"/>
+        </svg>
+      </div>
+      <div class="boot-msg" id="boot-msg">Hoisting the sails<span class="d">.</span><span class="d d2">.</span><span class="d d3">.</span></div>
+      <div class="boot-track"><i></i></div>
+    </div>
+  </div>
+
+  <main class="app">
+
+    <!-- ============ SCREEN: AUTH (login / register) ============ -->
+    <section id="screen-auth" class="screen is-active">
+      <div class="auth-wrap">
+        <div class="auth-brand">
+          <span class="auth-plaque">Crew Manager</span>
+          <p class="auth-tag">Log in to set sail with your crew</p>
+        </div>
+        <div class="auth-panel">
+          <div id="auth-form-login">
+            <div class="auth-title">Log in</div>
+            <div id="auth-login-error" class="auth-error"></div>
+            <label class="auth-label" for="auth-login-email">Email</label>
+            <input id="auth-login-email" class="auth-input" type="email" autocomplete="email" placeholder="you@example.com" />
+            <label class="auth-label" for="auth-login-password">Password</label>
+            <input id="auth-login-password" class="auth-input" type="password" autocomplete="current-password" placeholder="••••••••" />
+            <button id="auth-login-btn" class="auth-btn" type="button">Log in</button>
+            <p class="auth-switch">New here? <a id="auth-to-register">Create an account</a></p>
+          </div>
+          <div id="auth-form-register" style="display:none">
+            <div class="auth-title">Create account</div>
+            <div id="auth-reg-error" class="auth-error"></div>
+            <label class="auth-label" for="auth-reg-username">Username</label>
+            <input id="auth-reg-username" class="auth-input" type="text" autocomplete="username" maxlength="20" placeholder="RedHawk" />
+            <p class="auth-hint">This is how friends find and add you.</p>
+            <label class="auth-label" for="auth-reg-email">Email</label>
+            <input id="auth-reg-email" class="auth-input" type="email" autocomplete="email" placeholder="you@example.com" />
+            <label class="auth-label" for="auth-reg-password">Password</label>
+            <input id="auth-reg-password" class="auth-input" type="password" autocomplete="new-password" placeholder="At least 8 characters" />
+            <label class="auth-label" for="auth-reg-confirm">Confirm password</label>
+            <input id="auth-reg-confirm" class="auth-input" type="password" autocomplete="new-password" placeholder="••••••••" />
+            <button id="auth-reg-btn" class="auth-btn" type="button">Create account</button>
+            <p class="auth-switch">Already have an account? <a id="auth-to-login">Log in</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN: MAIN MENU (slots home) ============ -->
+    <section id="screen-newgame" class="screen">
+      <!-- kept hidden so legacy wiring in game-init.js / game-newgame.js never breaks -->
+      <div id="saved-list" style="display:none"></div>
+      <button id="new-game-btn" type="button" style="display:none"></button>
+
+      <div class="hm-wrap">
+        <header class="hm-brand"><span class="brand__plaque">Crew Manager</span></header>
+        <div class="hm-grid">
+          <aside class="hm-account" id="hm-account"></aside>
+          <section class="hm-right">
+            <div class="hm-slots-h">Your crews</div>
+            <div class="hm-slots" id="hm-slots"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN: ACCOUNT ============ -->
+    <section id="screen-account" class="screen">
+      <div class="acc-wrap">
+        <div class="acc-head">
+          <button class="acc-back" id="ac-back" type="button" aria-label="Back">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          </button>
+          <span class="acc-title">Account</span>
+        </div>
+        <div class="acc-card">
+          <div class="acc-avatar" id="ac-avatar">?</div>
+          <div>
+            <div class="acc-name" id="ac-name">—</div>
+            <div class="acc-email" id="ac-email">—</div>
+          </div>
+        </div>
+        <button class="acc-logout" id="ac-logout" type="button">Log out</button>
+        <div id="ac-admin-wrap" style="display:none">
+          <button class="acc-gold" id="ac-admin-open" type="button">Open admin dashboard</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN: FRIENDS ============ -->
+    <section id="screen-friends" class="screen">
+      <div class="acc-wrap">
+        <div class="acc-head">
+          <button class="acc-back" id="fr-back" type="button" aria-label="Back">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          </button>
+          <span class="acc-title">Friends</span>
+        </div>
+        <div class="acc-soon">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6"/><path d="M18 13.6c2 .5 3.2 1.9 3.2 4.4"/></svg>
+          <p>Coming soon — add friends by username.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN: SETTINGS ============ -->
+    <section id="screen-settings" class="screen">
+      <div class="acc-wrap">
+        <div class="acc-head">
+          <button class="acc-back" id="se-back" type="button" aria-label="Back">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          </button>
+          <span class="acc-title">Settings</span>
+        </div>
+        <div class="acc-soon">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M22 12h-3M5 12H2M19 5l-2 2M7 17l-2 2M19 19l-2-2M7 7 5 5"/></svg>
+          <p>Coming soon — sound, language and more.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN: ADMIN DASHBOARD ============ -->
+    <section id="screen-admin" class="screen">
+      <div class="adm-shell">
+        <div class="adm-side">
+          <div class="adm-brand">Admin</div>
+          <button class="adm-nav active" type="button" data-section="overview">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Overview
+          </button>
+          <button class="adm-nav" type="button" data-section="users">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6"/><path d="M18 13.6c2 .5 3.2 1.9 3.2 4.4"/></svg> Users
+          </button>
+          <button class="adm-nav" type="button" data-section="characters">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 18.3 6.8 19l1-5.8L3.6 9.1l5.8-.8z"/></svg> Characters
+          </button>
+          <button class="adm-nav" type="button" data-section="worlds">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18"/></svg> Worlds
+          </button>
+          <button class="adm-nav" type="button" data-section="settings">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M22 12h-3M5 12H2M19 5l-2 2M7 17l-2 2M19 19l-2-2M7 7 5 5"/></svg> Settings
+          </button>
+          <button class="adm-nav back" id="adm-to-game" type="button">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> Back to game
+          </button>
+        </div>
+        <div class="adm-content" id="adm-content"></div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN: WORLDS (multiplayer lobby) ============ -->
+    <section id="screen-worlds" class="screen">
+      <div class="wl-wrap" id="wl-content"></div>
+    </section>
+
+    <!-- ============ SCREEN: COMPETITION (standings + matchday) ============ -->
+    <section id="screen-competition" class="screen">
+      <div class="wl-wrap" id="cp-content"></div>
+    </section>
+
+    <!-- ============ SCREEN: NEW GAME SETUP ============ -->
+    <section id="screen-create" class="screen">
+      <header class="brand"><span class="brand__plaque" style="font-size:28px">New game</span></header>
+      <section class="panel reveal">
+        <label class="field">
+          <span class="field__label">Crew name</span>
+          <input id="crew-name" type="text" maxlength="28" autocomplete="off" placeholder="E.g. The Sunrise Pirates" />
+        </label>
+        <div class="field">
+          <span class="field__label">Choose your captain</span>
+          <div class="carousel-wrap" id="carousel-wrap">
+            <div class="carousel" id="captain-carousel" role="listbox" aria-label="Choose your captain"></div>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field__label">Difficulty</span>
+          <div class="diff-list" id="difficulty-list" role="group" aria-label="Choose difficulty">
+            <button type="button" class="diff-card" data-diff="easy" aria-pressed="false">
+              <div class="diff-card__name">Easy <span>&middot; East Blue</span></div>
+              <div class="diff-card__desc">Rivals develop slowly. Build your legend at your own pace.</div>
+            </button>
+            <button type="button" class="diff-card is-selected" data-diff="normal" aria-pressed="true">
+              <div class="diff-card__name">Normal <span>&middot; Paradise</span></div>
+              <div class="diff-card__desc">Rivals keep pace. Earn the top spot with sharp management.</div>
+            </button>
+            <button type="button" class="diff-card" data-diff="hard" aria-pressed="false">
+              <div class="diff-card__name">Hard <span>&middot; New World</span></div>
+              <div class="diff-card__desc">Rivals outgrow you. Only a master reaches Laugh Tale.</div>
+            </button>
+          </div>
+        </div>
+        <p class="berries">Starting funds: <span id="start-berries">—</span></p>
+        <p id="form-hint" class="form-hint">Enter a crew name and choose a captain to start.</p>
+        <button id="start-btn" class="btn-gold" type="button" disabled>Start new game</button>
+      </section>
+      <div style="text-align:center;margin-top:6px"><button id="create-back" class="btn-ghost" type="button">Back</button></div>
+    </section>
+
+    <!-- ============ SCREEN: ALL SAVES ============ -->
+    <section id="screen-saves" class="screen">
+      <header class="brand"><span class="brand__plaque" style="font-size:28px">Saved games</span></header>
+      <section class="panel">
+        <h2 class="panel__title">Saved games <span id="saves-count" class="panel__count"></span></h2>
+        <div id="saves-all" class="saved-list"></div>
+      </section>
+      <div style="text-align:center;margin-top:6px"><button id="saves-back" class="btn-ghost" type="button">Back</button></div>
+    </section>
+
+    <!-- ============ SCREEN: HOME ============ -->
+    <section id="screen-home" class="screen"><div id="home-content" class="home"></div></section>
+    <!-- ============ SCREEN: TRANSFER MARKET ============ -->
+    <section id="screen-market" class="screen"><div id="market-content"></div></section>
+    <!-- ============ SCREEN: CREW & LINE-UP ============ -->
+    <section id="screen-crew" class="screen"><div id="crew-content"></div></section>
+    <!-- ============ SCREEN: TRAINING ============ -->
+    <section id="screen-training" class="screen"><div id="training-content"></div></section>
+    <section id="screen-league" class="screen"><div id="league-content"></div></section>
+    <section id="screen-matchday" class="screen"><div id="matchday-content"></div></section>
+    <section id="screen-battle" class="screen"><div id="battle-content"></div></section>
+
+    <!-- ============ MODAL (confirm / info) ============ -->
+    <div id="modal-overlay" class="modal-overlay" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h3 id="modal-title" class="modal__title">Confirm</h3>
+        <p id="modal-msg" class="modal__msg"></p>
+        <div class="modal__actions">
+          <button id="modal-cancel" class="btn-soft" type="button">Cancel</button>
+          <button id="modal-confirm" class="btn-danger" type="button">Delete</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="data-pirates.js?v=4"></script>
+  <script src="game-core.js?v=2"></script>
+  <script src="game-newgame.js?v=1"></script>
+  <script src="game-home.js?v=4"></script>
+  <script src="game-market.js?v=3"></script>
+  <script src="game-crew.js?v=1"></script>
+  <script src="game-league.js?v=3"></script>
+  <script src="game-training.js?v=2"></script>
+  <script src="game-battle.js?v=8"></script>
+  <script src="game-tournament.js?v=3"></script>
+  <script src="game-init.js?v=1"></script>
+  <script src="api.js?v=7"></script>
+  <script src="auth-ui.js?v=2"></script>
+  <script src="menu.js?v=2"></script>
+  <script src="admin.js?v=2"></script>
+  <script src="worlds.js?v=2"></script>
+  <script src="competition.js?v=1"></script>
+  <script src="mp-online.js?v=3"></script>
+  <script src="mp-matchday.js"></script>
+  <script src="mp-achievements.js"></script>
+  <script src="mp-missions.js"></script>
+  <script src="mp-chest.js"></script>
+  <script src="mp-market.js?v=2"></script>
+  <script src="mp-training.js?v=1"></script>
+  <script src="mp-tournament.js?v=1"></script>
+  <script src="mp-crew.js"></script>
+  <script src="mp-battle.js"></script>
+  <script src="boot.js?v=1"></script>
+  <script src="mp-inventory.js"></script>
+  <script src="mp-chest.js"></script>
+</body>
+</html>

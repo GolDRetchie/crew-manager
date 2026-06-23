@@ -1,0 +1,58 @@
+/* auth.css — inlog/registreer-poort, Crew Manager brand-stijl */
+
+#screen-auth{
+  min-height:100vh;
+  padding:24px 16px; box-sizing:border-box;
+  background:transparent;
+}
+
+#screen-auth.is-active{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+
+.auth-wrap{ width:100%; max-width:380px; }
+
+.auth-brand{ text-align:center; margin-bottom:18px; }
+.auth-plaque{
+  display:inline-block; font-family:'Bangers',sans-serif; font-size:30px; color:#3a2708;
+  background:#f1e2be; border:3px solid #9a6b1e; border-radius:12px; padding:6px 26px;
+  box-shadow:0 5px 0 rgba(0,0,0,.25), inset 0 0 0 2px rgba(154,107,30,.25);
+  text-shadow:0 2px 0 rgba(255,255,255,.35); letter-spacing:.5px;
+}
+.auth-tag{ color:#dcb55f; font-family:'Spectral',serif; font-size:13px; margin:10px 0 0; }
+
+.auth-panel{
+  background:#f1e2be; border:2px solid #8a5a2b; border-radius:14px; padding:20px;
+  box-shadow:0 8px 22px rgba(0,0,0,.28), inset 0 0 0 2px rgba(138,90,43,.18);
+}
+.auth-title{ font-family:'Bangers',sans-serif; font-size:26px; color:#3a2708; margin:0 0 16px; letter-spacing:.5px; }
+
+.auth-label{
+  display:block; font-family:'Spectral',serif; font-size:12px; font-weight:600; color:#6b4a26;
+  text-transform:uppercase; letter-spacing:.6px; margin:0 0 5px;
+}
+.auth-input{
+  width:100%; box-sizing:border-box; font-family:'Spectral',serif; font-size:15px; color:#3a2708;
+  background:#fff8e7; border:1.5px solid #8a5a2b; border-radius:8px; padding:10px 13px; margin:0 0 13px;
+}
+.auth-input:focus{ outline:none; border-color:#9a6b1e; box-shadow:0 0 0 3px rgba(231,185,74,.35); }
+.auth-input::placeholder{ color:#b39c6f; font-style:italic; }
+
+.auth-hint{ font-family:'Spectral',serif; font-size:11px; color:#9a7b4a; font-style:italic; margin:-8px 0 13px; }
+
+.auth-btn{
+  width:100%; font-family:'Bangers',sans-serif; font-size:20px; letter-spacing:1px; color:#3a2708;
+  background:linear-gradient(180deg,#f4cf6a,#e7b94a); border:2px solid #9a6b1e; border-radius:11px;
+  padding:11px; box-shadow:0 5px 0 #9a6b1e; margin-top:4px; cursor:pointer;
+}
+.auth-btn:active{ transform:translateY(2px); box-shadow:0 3px 0 #9a6b1e; }
+.auth-btn:disabled{ opacity:.7; cursor:default; }
+
+.auth-switch{ text-align:center; margin:14px 0 0; font-family:'Spectral',serif; font-size:13px; color:#6b4a26; }
+.auth-switch a{ color:#9a6b1e; font-weight:600; cursor:pointer; text-decoration:none; }
+.auth-switch a:hover{ text-decoration:underline; }
+
+.auth-error{
+  display:none; background:#f8d7d2; border:1.5px solid #c0492f; border-radius:8px; color:#8a2a18;
+  font-family:'Spectral',serif; font-size:13px; padding:9px 12px; margin:0 0 13px;
+}

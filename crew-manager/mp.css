@@ -1,0 +1,70 @@
+/* mp.css — Worlds-lobby (#screen-worlds) + competitie (#screen-competition) + admin-wereldenlijst */
+
+.wl-wrap{ max-width:460px; margin:0 auto; padding:6px 0; }
+
+.wl-head{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.wl-back{ width:36px; height:36px; flex:none; background:#f1e2be; border:2px solid #8a5a2b; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#9a6b1e; box-shadow:inset 0 0 0 2px rgba(138,90,43,.15); cursor:pointer; padding:0; }
+.wl-back:active{ transform:translateY(1px); }
+.wl-title{ font-family:'Bangers',sans-serif; font-size:26px; color:#f1e2be; letter-spacing:.5px; }
+
+.wl-lbl{ font-family:'Spectral',serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; color:#cfe0d8; margin:14px 2px 8px; }
+
+.wl-globe{ width:44px; height:44px; flex:none; border-radius:10px; background:#2f6f96; color:#fff; display:flex; align-items:center; justify-content:center; }
+.wl-globe.sm{ width:38px; height:38px; }
+
+.wl-hero{ background:#f1e2be; border:2px solid #9a6b1e; border-radius:13px; padding:13px; box-shadow:inset 0 0 0 2px rgba(154,107,30,.2); margin-bottom:10px; }
+.wl-hero-row{ display:flex; align-items:center; gap:11px; margin-bottom:11px; }
+.wl-hero-name{ font-family:'Bangers',sans-serif; font-size:19px; color:#3a2708; letter-spacing:.4px; }
+.wl-sub{ font-family:'Spectral',serif; font-size:12px; color:#6b4a26; }
+.wl-name{ font-family:'Spectral',serif; font-size:14px; font-weight:600; color:#3a2708; }
+
+.wl-row{ display:flex; align-items:center; gap:11px; background:#f1e2be; border:2px solid #8a5a2b; border-radius:11px; padding:9px 11px; margin-bottom:8px; }
+
+.wl-gold{ width:100%; box-sizing:border-box; font-family:'Bangers',sans-serif; font-size:16px; letter-spacing:.5px; color:#3a2708; background:linear-gradient(180deg,#f4cf6a,#e7b94a); border:2px solid #9a6b1e; border-radius:9px; padding:9px; box-shadow:0 4px 0 #9a6b1e; cursor:pointer; }
+.wl-gold:active{ transform:translateY(2px); box-shadow:0 2px 0 #9a6b1e; }
+.wl-leave{ width:100%; box-sizing:border-box; font-family:'Spectral',serif; font-weight:600; font-size:13px; color:#a3432f; background:none; border:none; padding:8px; margin-top:4px; cursor:pointer; }
+
+.wl-join{ font-family:'Bangers',sans-serif; font-size:13px; letter-spacing:.4px; color:#3a2708; background:linear-gradient(180deg,#f4cf6a,#e7b94a); border:2px solid #9a6b1e; border-radius:8px; padding:7px 14px; box-shadow:0 3px 0 #9a6b1e; flex:none; cursor:pointer; }
+.wl-join:active{ transform:translateY(2px); box-shadow:0 1px 0 #9a6b1e; }
+.wl-join:disabled{ opacity:.6; cursor:default; }
+
+.wl-codewrap{ display:flex; gap:8px; }
+.wl-code{ flex:1; box-sizing:border-box; font-family:'Spectral',serif; font-size:14px; color:#3a2708; background:#fff8e7; border:1.5px solid #8a5a2b; border-radius:8px; padding:9px 12px; text-transform:uppercase; letter-spacing:1px; }
+
+.wl-muted{ font-family:'Spectral',serif; font-size:13px; color:#6b4a26; padding:6px 2px; }
+.wl-soft{ font-family:'Spectral',serif; font-size:13px; background:#f1e2be; border:2px dashed #8a5a2b; border-radius:11px; padding:16px; text-align:center; color:#6b4a26; }
+.wl-err{ font-family:'Spectral',serif; font-size:13px; color:#8a2a18; background:#f8d7d2; border:1.5px solid #c0492f; border-radius:8px; padding:9px 12px; margin-top:8px; }
+
+.wl-badge{ font-family:'Spectral',serif; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.4px; border-radius:5px; padding:2px 7px; flex:none; }
+.wl-badge.open{ color:#854f0b; background:#faeeda; border:1px solid #ba7517; }
+.wl-badge.act{ color:#0f6e56; background:#cdeee1; border:1px solid #1d9e75; }
+.wl-badge.fin{ color:#444441; background:#e7e5dc; border:1px solid #b4b2a9; }
+
+/* ---- Competitie ---- */
+.cp-title{ font-family:'Bangers',sans-serif; font-size:21px; color:#f1e2be; letter-spacing:.5px; line-height:1; }
+.cp-subt{ font-family:'Spectral',serif; font-size:11px; color:#cfe0d8; }
+
+.cp-tbl{ background:#f1e2be; border:2px solid #8a5a2b; border-radius:11px; overflow:hidden; }
+.cp-tr{ display:grid; grid-template-columns:24px 1fr 30px 38px; align-items:center; gap:8px; padding:8px 10px; border-bottom:1px solid rgba(138,90,43,.2); }
+.cp-tr:last-child{ border-bottom:none; }
+.cp-tr.cp-hd{ background:#e9d6a8; }
+.cp-tr.cp-hd > div{ font-family:'Spectral',serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.4px; color:#6b4a26; }
+.cp-tr.me{ background:linear-gradient(180deg,#f8e6b0,#efd488); }
+.cp-pos{ font-family:'Bangers',sans-serif; font-size:15px; color:#6b4a26; text-align:center; }
+.cp-cr{ font-family:'Spectral',serif; font-size:13px; font-weight:600; color:#3a2708; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cp-crp{ font-family:'Spectral',serif; font-size:10px; color:#6b4a26; }
+.cp-c{ font-family:'Spectral',serif; font-size:11px; color:#6b4a26; text-align:center; }
+.cp-pt{ font-family:'Bangers',sans-serif; font-size:16px; color:#3a2708; text-align:center; }
+
+.cp-fx{ display:flex; align-items:center; gap:8px; background:#f1e2be; border:2px solid #8a5a2b; border-radius:11px; padding:9px 11px; margin-bottom:8px; }
+.cp-side{ flex:1; font-family:'Spectral',serif; font-size:13px; font-weight:600; color:#3a2708; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cp-side.r{ text-align:right; }
+.cp-vs{ font-family:'Bangers',sans-serif; font-size:13px; color:#9a6b1e; flex:none; }
+
+/* ---- Admin: wereldenlijst (binnen het admin-dashboard) ---- */
+.adm-wrow{ display:flex; align-items:center; gap:11px; background:#f7ecca; border:1.5px solid #8a5a2b; border-radius:10px; padding:9px 11px; margin-top:9px; }
+.adm-wrow:first-child{ margin-top:0; }
+.adm-wname{ font-family:'Spectral',serif; font-size:14px; font-weight:600; color:#3a2708; }
+.adm-wsub{ font-family:'Spectral',serif; font-size:11px; color:#6b4a26; margin-top:2px; }
+.adm-wcode{ font-family:'Bangers',sans-serif; letter-spacing:1px; color:#9a6b1e; }
+.adm-wbtns{ display:flex; gap:6px; flex:none; }

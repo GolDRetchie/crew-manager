@@ -1,0 +1,251 @@
+// Crew Manager — database-schema
+// Bestaande modellen (User, Character) + de nieuwe multiplayer-kern.
+//
+// LET OP: als je eigen "generator client" of "datasource db" blok er anders
+// uitziet dan hieronder, houd dan JOUW versie van die twee bovenste blokken
+// aan en plak alleen de modellen (vanaf "model User") eronder.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+// Bestaande modellen
+// ----------------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  isAdmin      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  xp           Int      @default(0)
+  missionStreak   Int      @default(0)
+  lastMissionDay  String?
+
+  memberships  WorldMembership[]
+  achievements UserAchievement[]
+  missions        PlayerMission[]
+  inventory       InventoryItem[]
+}
+
+model Character {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  role      String
+  power     Int
+  defense   Int
+  speed     Int
+  crew      String
+  imageUrl  String?
+  attacks   String[]
+  altRoles  String[]
+  isCaptain Boolean  @default(false)
+  isNavy    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ----------------------------------------------------------------------------
+// Multiplayer-kern
+// ----------------------------------------------------------------------------
+
+// Een gedeelde competitie waar meerdere spelers in zitten.
+// status: "open" (nog te joinen) | "active" (competitie loopt) | "finished"
+model World {
+  id            String    @id @default(cuid())
+  name          String
+  status        String    @default("open")
+  difficulty    String    @default("normal")
+  maxPlayers    Int       @default(16)
+  joinCode      String    @unique
+  currentDay    Int       @default(0)
+  totalDays     Int       @default(0)
+  recruitsUntil DateTime?              // NIEUW
+  hostId        String?                // NIEUW
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  listings    MarketListing[]
+  bracket   Json?
+
+  memberships   WorldMembership[]
+  matches       Match[]
+}
+
+model WorldMembership {
+  id           String   @id @default(cuid())
+  worldId      String
+  userId       String?                 // was String → nu optioneel (bots hebben geen user)
+  crewName     String
+  captain      String?                 // NIEUW
+  isBot        Boolean  @default(false) // NIEUW
+  funds        Int      @default(0)
+  played       Int      @default(0)
+  won          Int      @default(0)
+  drawn        Int      @default(0)
+  lost         Int      @default(0)
+  goalsFor     Int      @default(0)
+  goalsAgainst Int      @default(0)
+  points       Int      @default(0)
+  joinedAt     DateTime @default(now())
+  capP        Int       @default(8)
+  capD        Int       @default(8)
+  capS        Int       @default(8)
+  capCond     Int       @default(100)
+  trainings   Training[]
+  lineup   Json?
+
+  // --- schip-grootte ---
+  shipTier    Int     @default(1)   // 1=Dinghy(cap3), 2=Caravel(cap7), 3=Yonko(cap13)
+
+  // --- cosmetics (los van tier; null = standaard-look) ---
+  hullColor   String?
+  deckColor   String?
+  sailColor   String?
+  trimColor   String?
+  jollyRoger  String? @default("skull")
+  figurehead  String? @default("none")
+
+  world        World         @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)  // User? (was User)
+  squad        SquadMember[]                                                                    // NIEUW
+  homeMatches  Match[]       @relation("HomeTeam")
+  awayMatches  Match[]       @relation("AwayTeam")
+
+  @@unique([worldId, userId])
+}
+
+// Eén wedstrijd op de competitiekalender. Tot een speeldag is "gespeeld"
+// staan homeScore/awayScore op null. (Het echt uitrekenen van de uitslag
+// = de simulatie, die bouwen we als losse stap.)
+model Match {
+  id          String   @id @default(cuid())
+  worldId     String
+  day         Int
+  homeId      String
+  awayId      String
+  homeScore   Int?
+  awayScore   Int?
+  played      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  world       World           @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  home        WorldMembership @relation("HomeTeam", fields: [homeId], references: [id], onDelete: Cascade)
+  away        WorldMembership @relation("AwayTeam", fields: [awayId], references: [id], onDelete: Cascade)
+}
+
+// Globale spelinstellingen (één enkele rij met id "global").
+model GlobalSettings {
+  id               String   @id @default("global")
+  registrationOpen Boolean  @default(true)
+  maintenanceMode  Boolean  @default(false)
+  broadcast        String   @default("")
+  updatedAt        DateTime @updatedAt
+  startingFunds    Int      @default(30000000)
+}
+
+model SquadMember {
+  id           String   @id @default(cuid())
+  membershipId String
+  name         String
+  role         String
+  p            Int
+  d            Int
+  s            Int
+  cond         Int      @default(100)
+  boughtPrice  Int      @default(0)
+  position     Int?
+  createdAt    DateTime @default(now())
+  altRoles    String[]  @default([])
+  isGeneric   Boolean   @default(false)
+
+  membership   WorldMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@index([membershipId])
+}
+
+model Training {
+  id            String         @id @default(cuid())
+  membershipId  String
+  membership    WorldMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  squadMemberId String?        // null = de kapitein traint
+  stat          String         // "p" | "d" | "s"
+  startedAt     DateTime       @default(now())
+
+  @@index([membershipId])
+}
+
+model MarketListing {
+  id           String   @id @default(cuid())
+  worldId      String
+  world        World    @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  name         String
+  role         String
+  altRoles     String[] @default([])
+  p            Int
+  d            Int
+  s            Int
+  price        Int
+  listedDay    Int
+  tenure       Int      @default(3)
+  saleAt       Int?
+  saleDiscount Float    @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([worldId])
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String              // catalog-id, bv. "league_champ"
+  unlockedAt    DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+model PlayerMission {
+  id          String   @id @default(cuid())
+  userId      String
+  scope       String   // "daily" | "weekly"
+  periodKey   String   // daily: "2026-06-22"   weekly: "2026-W25"
+  missionKey  String
+  difficulty  String   // "bronze" | "silver" | "gold" | "bonus"
+  target      Int
+  progress    Int      @default(0)
+  baseline    Int?
+  worldId     String?
+  completed   Boolean  @default(false)
+  claimed     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, scope, periodKey, missionKey])
+  @@index([userId, scope, periodKey])
+}
+
+model InventoryItem {
+  id         String   @id @default(cuid())
+  userId     String
+  kind       String   // "role_card" | "crew_card"
+  value      String
+  rarity     String   @default("bronze")
+  data       Json?
+  source     String?
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

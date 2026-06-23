@@ -1,0 +1,66 @@
+/* ====================================================================
+   boot.css — boot-splash, Log Pose loader, inline loader, save-indicator
+   Link dit ná je andere CSS in index.html.
+   ==================================================================== */
+
+/* ---------------- boot splash ---------------- */
+.boot-splash{ position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(120% 90% at 50% -10%, #1d6886, #143f55, #0b2533);
+  transition:opacity .6s ease; }
+.boot-splash.boot-hide{ opacity:0; pointer-events:none; }
+.boot-in{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; text-align:center; padding:20px; }
+.boot-title{ font-family:'Bangers',system-ui; font-size:54px; line-height:.9; letter-spacing:2.5px; color:#f4cf6a;
+  text-shadow:0 3px 0 #9a6b1e, 0 6px 16px rgba(0,0,0,.5); margin-bottom:22px; }
+.boot-pose{ filter:drop-shadow(0 8px 12px rgba(0,0,0,.45)); animation:boot-bob 3.4s ease-in-out infinite; }
+.boot-pose .lp{ width:120px; height:120px; display:block; }
+.boot-msg{ font-family:'Spectral',Georgia,serif; font-style:italic; font-size:16px; color:rgba(241,226,190,.88);
+  margin-top:18px; height:22px; }
+.boot-track{ position:relative; width:210px; height:7px; margin-top:14px; border-radius:6px; overflow:hidden;
+  background:rgba(11,37,51,.55); border:1.5px solid #9a6b1e; }
+.boot-track i{ position:absolute; top:0; left:0; width:40%; height:100%; border-radius:6px;
+  background:linear-gradient(90deg, transparent, #f4cf6a, transparent); animation:boot-bar 1.3s ease-in-out infinite; }
+.boot-sea{ position:absolute; left:0; right:0; bottom:0; height:64px; overflow:hidden; opacity:.5; z-index:1; }
+.boot-sea svg{ position:absolute; bottom:0; left:0; width:1440px; height:64px; animation:boot-wave 4s linear infinite; }
+
+@keyframes boot-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
+@keyframes boot-bar{ 0%{ transform:translateX(-110%); } 100%{ transform:translateX(330%); } }
+@keyframes boot-wave{ to{ transform:translateX(-72px); } }
+
+/* cycling dots */
+.boot-msg .d, .cm-loader .d{ animation:boot-dots 1.4s steps(1) infinite; }
+.boot-msg .d2{ animation-delay:.2s; } .boot-msg .d3{ animation-delay:.4s; }
+@keyframes boot-dots{ 0%,20%{ opacity:0; } 50%,100%{ opacity:1; } }
+
+/* ---------------- Log Pose (shared) ---------------- */
+/* the needle "seeks" a course like a real Log Pose recording a magnetic field */
+.lp .lp-needle{ transform-box:fill-box; transform-origin:center;
+  animation:lp-seek 3s cubic-bezier(.5,0,.5,1) infinite; }
+@keyframes lp-seek{
+  0%{ transform:rotate(0deg); }
+  22%{ transform:rotate(155deg); }
+  40%{ transform:rotate(80deg); }
+  68%{ transform:rotate(255deg); }
+  100%{ transform:rotate(360deg); }
+}
+
+/* ---------------- inline loader (replaces kale "Loading…") ---------------- */
+.cm-loader{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  min-height:55vh; padding:20px; text-align:center; }
+.cm-loader .lp-sm{ width:74px; height:74px; flex:0 0 auto; display:block; }
+.cm-loader-l{ font-family:'Bangers',system-ui; font-size:20px; letter-spacing:.6px; color:var(--parch,#f1e2be);
+  text-shadow:0 2px 4px rgba(0,0,0,.45); }
+
+/* ---------------- "Saved automatically" indicator (anchor) ---------------- */
+.cm-saved{ position:fixed; left:16px; bottom:16px; z-index:9998; display:flex; align-items:center; gap:9px;
+  padding:8px 15px 8px 11px; background:var(--parch,#f1e2be); border:2px solid var(--line,#8a5a2b); border-radius:30px;
+  box-shadow:0 8px 22px rgba(0,0,0,.32); font-family:'Bangers',system-ui; font-size:14px; letter-spacing:.4px; color:var(--ink,#3a2708);
+  opacity:0; transform:translateY(10px); transition:opacity .3s ease, transform .3s ease; }
+.cm-saved.in{ opacity:1; transform:translateY(0); }
+.cm-saved .cm-anchor{ width:20px; height:25px; display:block; }
+.cm-saved .cm-anchor-g{ transform-box:fill-box; transform-origin:50% 12%; animation:cm-swing 2.4s ease-in-out infinite; }
+@keyframes cm-swing{ 0%,100%{ transform:rotate(-12deg); } 50%{ transform:rotate(12deg); } }
+
+@media (max-width:480px){
+  .boot-title{ font-size:42px; }
+  .boot-pose .lp{ width:104px; height:104px; }
+}
