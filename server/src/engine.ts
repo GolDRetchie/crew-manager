@@ -1,31 +1,18 @@
 "use strict";
 
 /* ====================================================================
-   engine.ts — de gedeelde wedstrijdmotor voor online leagues (brok 4)
+   engine.ts — de gedeelde wedstrijdmotor voor online leagues
 
-   Plek:  server/src/engine.ts   (naast online.ts, market.ts)
-
-   Wat hij doet (1-op-1 geport uit game-league.js / game-tournament.js):
-   - 30-dagen eilandenkalender: gewone speeldagen, navy-dagen (marine),
-     rustdagen en op dag 30 de Laugh Tale Grand Tournament (top 8).
-   - kracht = kapitein × conditie + bemanning × conditie  (condFactor 0.6–1.0)
-   - uitslag met ±22% ruis -> W/L (geen gelijkspel)
-   - per gevecht: +1/+1/+1 groei, -12 conditie; +3,5M winst / +3M verlies; 3 pt/win
-   - rustdag: volledige conditie terug
-   - dag 0 = voorbereidingsdag (geen wedstrijd — bouw je crew op de markt)
+   STAP 4a + 4b verwerkt:
+   - Rol-positie telt niet meer mee in het gevecht. Iedereen op het dek
+     vecht op 1,00; wie conditie < 80 heeft vecht op 0,90 (condMult).
+   - FIGHT_COND_COST = 6 (conditie per gevecht). Bank = volledig hersteld
+     (cond -> 100) in één speeldag.
+   - De opstelling slaat het dek nu op als GENERIEKE LIJST: lineup.deck is
+     een array van namen (posities zonder rol). Oude opstellingen met
+     deck: { role: naam } worden automatisch ingelezen (backward-compat).
 
    Mount in index.ts:   app.use("/api/online", engineRouter)
-                        (zelfde auth-middleware ervoor als bij online.ts/market.ts)
-   Aangeroepen door:    online.ts closeAndFill -> buildSeasonCalendar(worldId)
-                        scheduler.ts          -> syncAllActiveWorlds()
-
-   ── Aannames die ik maakte waar single-player het niet hard vastlegde
-   1. NAVY-DAGEN tellen NIET mee in de ranglijst: je vecht tegen de admiraal
-      voor inkomen + groei + conditieverlies, maar winst/verlies levert geen
-      competitiepunten op. De admiraal schaalt mee met de league (gemiddelde
-      crew-kracht) en wordt per navy-dag zwaarder.
-   2. KRACHT telt voorlopig ÁLLE bemanningsleden mee (max 13). Zodra de
-      opstelling (9 dek + 4 bank) er is, beperk ik dit tot het dek.
    ==================================================================== */
 
 import { Router, Request, Response } from "express";
@@ -36,17 +23,17 @@ import { bumpMissions } from "./missions";
 /* ---- kalender ---- */
 const TOTAL_DAYS = 30;
 const REST_DAYS  = new Set([6, 12, 18, 24, 29]);
-const NAVY_DAYS  = [7, 15, 20, 27];                 // index -> oplopende admiraal-zwaarte
+const NAVY_DAYS  = [7, 15, 20, 27];
 const NAVY_RAMP  = [0.85, 1.0, 1.10, 1.25];
 const FINAL_DAY  = 30;
 
-/* ---- regels (uit game-league.js) ---- */
+/* ---- regels ---- */
 const WIN_PTS         = 3;
 const WIN_INCOME      = 3_500_000;
 const LOSS_INCOME     = 3_000_000;
-const FIGHT_COND_COST = 12;
+const FIGHT_COND_COST = 6;            // conditie per gevecht (training kost 3, zie training.ts)
 const STAT_CAP        = 99;
-const NOISE           = 0.22;                        // ±22% ruis op de uitslag
+const NOISE           = 0.22;         // ±22% ruis op de uitslag
 
 type DayType = "prep" | "normal" | "navy" | "rest" | "final";
 export function islandType(day: number): DayType {
@@ -68,54 +55,61 @@ type Mem = {
 function condFactor(cond: number){ const c = Math.max(0, Math.min(100, cond ?? 100)); return 0.6 + 0.4 * (c / 100); }
 function bounty(sum: number){ return Math.max(1, sum) * 1_000_000; }
 
-/* ---- opstelling: alleen de 9 op het dek vechten (met rol-bonus) ---- */
+/* ---- conditie-regel (vervangt de oude rol-fit) ---- */
+const COND_THRESHOLD = 80;    // onder deze conditie vecht een lid verzwakt
+const TIRED_MULT     = 0.90;  // < 80 conditie = 0,90; anders 1,00 (rol-positie telt niet meer)
+function condMult(member: SquadM): number {
+  return (member.cond < COND_THRESHOLD) ? TIRED_MULT : 1.0;
+}
+
+/* ---- generieke opstelling: alleen wie op het dek staat vecht ---- */
 const DECK_ROLES = ["Swordsman", "Sniper", "Chef", "Doctor", "Archaeologist",
                     "Shipwright", "Musician", "Navigator", "Helmsman"];
-const FIT_BONUS     = 1.10;   // lid staat in z'n eigen rol
-const FIT_OFF       = 0.90;   // off-role (kleine malus)
-const BENCH_RECOVER = 20;     // bankleden herstellen conditie per speeldag (cap 100)
 
-function fitMult(member: SquadM, role: string): number {
-  if (member.role === role || (Array.isArray(member.altRoles) && member.altRoles.indexOf(role) >= 0)) return FIT_BONUS;
-  if (member.role === "Crewmate") return 1.0;
-  return FIT_OFF;
+/* lees de dek-namen uit beide formaten:
+   nieuw -> deck: [naam, naam, ...]      (generieke posities)
+   oud   -> deck: { role: naam, ... }    (rol-sleutels; backward-compat) */
+function deckNames(lu: any): string[] {
+  if (!lu) return [];
+  const d = lu.deck;
+  if (Array.isArray(d)) return d.filter(Boolean);
+  if (d && typeof d === "object") return DECK_ROLES.map(r => d[r]).filter(Boolean);
+  return [];
 }
-// de (max 9) dek-leden: uit de opgeslagen opstelling, anders de 9 sterkste in hun eigen rol
-function deckOf(m: Mem): { role: string; member: SquadM }[] {
-  const lu = m.lineup;
-  if (lu && lu.deck){
-    const byName = new Map(m.squad.map(s => [s.name, s] as [string, SquadM]));
-    const out: { role: string; member: SquadM }[] = [];
-    for (const role of DECK_ROLES){ const nm = lu.deck[role]; const mem = nm ? byName.get(nm) : undefined; if (mem) out.push({ role, member: mem }); }
-    return out;
+/* de (max 9) dek-leden uit de opstelling; anders de 9 sterksten als fallback */
+function deckOf(m: Mem): SquadM[] {
+  const byName = new Map(m.squad.map(s => [s.name, s] as [string, SquadM]));
+  const names = deckNames(m.lineup);
+  if (names.length){
+    const out: SquadM[] = [];
+    for (const nm of names){ const mem = byName.get(nm); if (mem) out.push(mem); }
+    return out.slice(0, 9);
   }
-  return m.squad.slice().sort((a, b) => (b.p + b.d + b.s) - (a.p + a.d + a.s)).slice(0, 9).map(s => ({ role: s.role, member: s }));
+  return m.squad.slice().sort((a, b) => (b.p + b.d + b.s) - (a.p + a.d + a.s)).slice(0, 9);
 }
 
 function crewStrength(m: Mem): number {
   let s = bounty(m.capP + m.capD + m.capS) * condFactor(m.capCond);
-  for (const { role, member } of deckOf(m)) s += bounty(member.p + member.d + member.s) * condFactor(member.cond) * fitMult(member, role);
+  for (const member of deckOf(m)) s += bounty(member.p + member.d + member.s) * condMult(member);
   return s;
 }
-function crewBountyRaw(m: Mem): number {            // zonder conditie — voor toernooi-seeding/tiebreak
+function crewBountyRaw(m: Mem): number {
   let s = bounty(m.capP + m.capD + m.capS);
   for (const q of m.squad) s += bounty(q.p + q.d + q.s);
   return s;
 }
-/* ±22% ruis, hoogste wint — vanuit a's perspectief (zoals `outcome` in SP) */
 function outcome(sa: number, sb: number): "W" | "L" {
   const na = sa * (1 + (Math.random() * 2 - 1) * NOISE);
   const nb = sb * (1 + (Math.random() * 2 - 1) * NOISE);
   return na >= nb ? "W" : "L";
 }
-/* cosmetische KO-score voor de fixtures-weergave */
 function makeScore(){
-  const w = 2 + Math.floor(Math.random() * 3);              // 2..4
+  const w = 2 + Math.floor(Math.random() * 3);
   const l = Math.max(0, Math.min(w - 1, Math.floor(Math.random() * w)));
   return { w, l };
 }
 
-/* ---- crews laden (met kapitein-stats + bemanning) ---- */
+/* ---- crews laden ---- */
 async function loadMems(worldId: string, ids?: string[]): Promise<Map<string, Mem>> {
   const rows = await prisma.worldMembership.findMany({
     where: ids ? { worldId, id: { in: ids } } : { worldId },
@@ -131,7 +125,7 @@ async function loadMems(worldId: string, ids?: string[]): Promise<Map<string, Me
   return map;
 }
 
-/* ---- uitslag toepassen op één crew ---- */
+/* ---- uitslag toepassen ---- */
 async function applyResult(memId: string, won: boolean){
   await prisma.worldMembership.update({
     where: { id: memId },
@@ -144,15 +138,14 @@ async function applyResult(memId: string, won: boolean){
     },
   });
 }
-/* alleen inkomen — voor de navy-dag, die niet meetelt in de ranglijst */
 async function grantIncome(memId: string, won: boolean){
   await prisma.worldMembership.update({
     where: { id: memId },
     data: { funds: { increment: won ? WIN_INCOME : LOSS_INCOME } },
   });
 }
-/* speeldag-effect: kapitein + de 9 dek-leden vechten (groei + -12 conditie),
-   de bank rust en herstelt conditie (+20, cap 100) */
+/* speeldag-effect: kapitein + dek-leden vechten (groei + −6 conditie),
+   de bank rust volledig uit (cond -> 100) */
 async function applyFight(m: Mem){
   await prisma.worldMembership.update({
     where: { id: m.id },
@@ -163,19 +156,19 @@ async function applyFight(m: Mem){
       capCond: Math.max(0, m.capCond - FIGHT_COND_COST),
     },
   });
-  const deck = [...new Set(deckOf(m).map(x => x.member.name))];   // namen op het dek
+  const deck = [...new Set(deckOf(m).map(x => x.name))];   // namen op het dek
 
   if (deck.length){
-    // dek: +1/+1/+1 (cap 99) + -12 conditie (floor 0)
     await prisma.squadMember.updateMany({ where: { membershipId: m.id, name: { in: deck }, p: { lt: STAT_CAP } }, data: { p: { increment: 1 } } });
     await prisma.squadMember.updateMany({ where: { membershipId: m.id, name: { in: deck }, d: { lt: STAT_CAP } }, data: { d: { increment: 1 } } });
     await prisma.squadMember.updateMany({ where: { membershipId: m.id, name: { in: deck }, s: { lt: STAT_CAP } }, data: { s: { increment: 1 } } });
     await prisma.squadMember.updateMany({ where: { membershipId: m.id, name: { in: deck } }, data: { cond: { decrement: FIGHT_COND_COST } } });
     await prisma.squadMember.updateMany({ where: { membershipId: m.id, cond: { lt: 0 } }, data: { cond: 0 } });
-    // bank: herstelt conditie, groeit niet
-    await prisma.squadMember.updateMany({ where: { membershipId: m.id, name: { notIn: deck } }, data: { cond: { increment: BENCH_RECOVER } } });
+    // bank (alles wat niet op het dek staat): volledig uitgerust in één beurt
+    await prisma.squadMember.updateMany({ where: { membershipId: m.id, name: { notIn: deck } }, data: { cond: 100 } });
   } else {
-    // niemand gekocht -> alleen de kapitein vocht; niets te doen voor de bemanning
+    // niemand op het dek -> alleen de kapitein vocht; rest van de crew rust uit
+    await prisma.squadMember.updateMany({ where: { membershipId: m.id }, data: { cond: 100 } });
   }
   await prisma.squadMember.updateMany({ where: { membershipId: m.id, cond: { gt: 100 } }, data: { cond: 100 } });
 }
@@ -183,8 +176,6 @@ async function applyFight(m: Mem){
 /* ====================================================================
    Dagen oplossen
    ==================================================================== */
-
-/* gewone speeldag: crew-vs-crew uit de kalender (Match-rijen) */
 async function resolveNormalDay(worldId: string, day: number){
   const matches = await prisma.match.findMany({ where: { worldId, day, played: false } });
   if (!matches.length) return;
@@ -207,8 +198,6 @@ async function resolveNormalDay(worldId: string, day: number){
   }
 }
 
-/* navy-dag: elke crew vecht tegen een admiraal die met de league meeschaalt.
-   Telt NIET mee in de ranglijst — alleen inkomen + groei + conditieverlies. */
 async function resolveNavyDay(worldId: string, day: number){
   const idx  = NAVY_DAYS.indexOf(day);
   const mems = await loadMems(worldId);
@@ -218,12 +207,11 @@ async function resolveNavyDay(worldId: string, day: number){
   const admiral = avg * (NAVY_RAMP[idx] ?? 1.0);
   for (const m of arr){
     const won = outcome(crewStrength(m), admiral) === "W";
-    await grantIncome(m.id, won);   // geen punten/record — alleen Berries
+    await grantIncome(m.id, won);
     await applyFight(m);
   }
 }
 
-/* rustdag: iedereen volledig op conditie, geen wedstrijd */
 async function resolveRestDay(worldId: string){
   await prisma.worldMembership.updateMany({ where: { worldId }, data: { capCond: 100 } });
   await prisma.squadMember.updateMany({ where: { membership: { worldId } }, data: { cond: 100 } });
@@ -231,15 +219,12 @@ async function resolveRestDay(worldId: string){
 
 /* ====================================================================
    Dag 30 — Laugh Tale Grand Tournament (top 8, single-elimination)
-   Geport uit game-tournament.js: seeding 1-8 / 4-5 / 3-6 / 2-7.
-   Alle crews zitten op de server, dus de hele bracket wordt in één keer
-   uitgerekend en als JSON op de wereld bewaard (frontend-viewer = aparte brok).
    ==================================================================== */
 async function runTournament(worldId: string){
   const mems = [...(await loadMems(worldId)).values()];
   const sorted = mems.slice().sort((a, b) => (b.points! - a.points!) || (crewBountyRaw(b) - crewBountyRaw(a)));
   const seeds  = sorted.slice(0, 8).map(m => m.id);
-  while (seeds.length < 8) seeds.push("");                  // padding (zou bij 12 crews nooit nodig zijn)
+  while (seeds.length < 8) seeds.push("");
 
   const nameOf = (id: string) => mems.find(m => m.id === id)?.crewName || "—";
   const strOf  = (id: string) => { const m = mems.find(x => x.id === id); return m ? crewStrength(m) : 0; };
@@ -271,9 +256,9 @@ async function runTournament(worldId: string){
 }
 
 /* ====================================================================
-   Eén dag vooruit + zelfherstellende synchronisatie
+   Eén dag vooruit + synchronisatie
    ==================================================================== */
-const busy = new Set<string>();                              // simpele lock (1 server-instantie)
+const busy = new Set<string>();
 
 export async function advanceWorldDay(worldId: string){
   if (busy.has(worldId)) return { skipped: true };
@@ -299,8 +284,6 @@ export async function advanceWorldDay(worldId: string){
   }
 }
 
-/* haal een wereld bij naar de dag die hij volgens de klok zou moeten hebben
-   (werkt ook als de server even uit stond — speelt gemiste dagen netjes in) */
 export async function syncWorld(worldId: string){
   const world = await prisma.world.findUnique({ where: { id: worldId } });
   if (!world || world.status !== "active") return;
@@ -323,9 +306,7 @@ export async function syncAllActiveWorlds(){
 }
 
 /* ====================================================================
-   Kalender bouwen (aangeroepen door online.ts closeAndFill)
-   dag 0 = voorbereidingsdag (geen fixtures); normale dagen krijgen een
-   roterende round-robin; navy/rust/finale-dagen krijgen géén Match-rijen.
+   Kalender bouwen
    ==================================================================== */
 export async function buildSeasonCalendar(worldId: string){
   const members = await prisma.worldMembership.findMany({ where: { worldId }, select: { id: true } });
@@ -336,13 +317,12 @@ export async function buildSeasonCalendar(worldId: string){
   const rows: any[] = [];
   for (let day = 1; day <= TOTAL_DAYS; day++){
     if (islandType(day) !== "normal") continue;
-    const r = rounds[(day - 1) % rounds.length];            // round-robin roteert over de reis
+    const r = rounds[(day - 1) % rounds.length];
     for (const [home, away] of r) rows.push({ worldId, day, homeId: home, awayId: away, played: false });
   }
   if (rows.length) await prisma.match.createMany({ data: rows });
 }
 
-/* round-robin via de cirkel-methode -> array van (N-1) rondes met [home, away] */
 function roundRobinRounds(ids: string[]): [string, string][][] {
   const teams = ids.slice();
   if (teams.length < 2) return [];
@@ -357,14 +337,13 @@ function roundRobinRounds(ids: string[]): [string, string][][] {
       if (h !== "__BYE__" && a !== "__BYE__") pairs.push(r % 2 === 0 ? [h, a] : [a, h]);
     }
     rounds.push(pairs);
-    arr = [arr[0], ...arr.slice(2), arr[1]];                 // eerste vast, rest roteert
+    arr = [arr[0], ...arr.slice(2), arr[1]];
   }
   return rounds;
 }
 
 /* ====================================================================
-   19:00 Europe/Amsterdam — hoeveel speeldag-momenten zijn er voorbij?
-   (geen extra schema-veld nodig: we rekenen vanaf recruitsUntil)
+   19:00 Europe/Amsterdam — speeldag-momenten
    ==================================================================== */
 function amsOffsetMinutes(d: Date): number {
   const ams = new Date(d.toLocaleString("en-US", { timeZone: "Europe/Amsterdam" }));
@@ -372,7 +351,7 @@ function amsOffsetMinutes(d: Date): number {
   return Math.round((ams.getTime() - utc.getTime()) / 60000);
 }
 function nineteenAms(y: number, m: number, day: number): Date {
-  const probe = new Date(Date.UTC(y, m, day, 12, 0, 0));    // offset bepalen op het midden van de dag
+  const probe = new Date(Date.UTC(y, m, day, 12, 0, 0));
   const off = amsOffsetMinutes(probe);
   return new Date(Date.UTC(y, m, day, 19, 0, 0) - off * 60000);
 }
@@ -393,8 +372,7 @@ function expectedDay(recruitsUntil: Date | null, now: Date): number {
 }
 
 /* ====================================================================
-   Route: host kan handmatig een speeldag draaien (test / vangnet).
-   De echte motor draait automatisch om 19:00 via scheduler.ts.
+   Routes
    ==================================================================== */
 function uid(req: Request): string {
   const id = (req as any).user?.id ?? (req as any).userId ?? (req as any).auth?.userId;
@@ -417,8 +395,6 @@ router.post("/leagues/:id/advance", async (req: Request, res: Response) => {
   }
 });
 
-/* je laatste (of dag-N) crew-vs-crew wedstrijd, met beide opstellingen — voor de battle-replay.
-   navy-dagen worden (nog) niet bewaard, dus die komen hier niet terug. */
 router.get("/leagues/:id/match", async (req: Request, res: Response) => {
   try {
     const me = uid(req);
@@ -441,7 +417,7 @@ router.get("/leagues/:id/match", async (req: Request, res: Response) => {
     const pack = (m: Mem) => ({
       crewName: m.crewName, captain: m.captain,
       captainStats: { p: m.capP, d: m.capD, s: m.capS },
-      deck: deckOf(m).map(x => ({ name: x.member.name, p: x.member.p, d: x.member.d, s: x.member.s })),
+      deck: deckOf(m).map(x => ({ name: x.name, role: x.role, p: x.p, d: x.d, s: x.s })),
     });
 
     res.json({

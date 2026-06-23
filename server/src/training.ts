@@ -23,8 +23,8 @@ import { prisma } from "./prisma";
 import { bumpMissions } from "./missions";
 
 const TRAIN_MS      = 6 * 3600 * 1000;   // 6 uur
-const TRAIN_GAIN    = 3;                  // +3 per sessie (zoals single-player)
-const STAT_CAP      = 99;
+const TRAIN_GAIN      = 3;                // +3 op de stat per sessie
+const TRAIN_COND_COST = 3;                // −3 conditie per afgeronde sessieconst STAT_CAP      = 99;
 const SLOTS_TOTAL   = 6;
 const SLOTS_PER_STAT = 2;
 const STATS = ["p", "d", "s"] as const;
@@ -49,18 +49,20 @@ export async function completeDueTrainings(): Promise<number> {
   const due = await prisma.training.findMany({ where: { startedAt: { lte: cutoff } } });
   for (const t of due){
     const stat = (t.stat as Stat);
-    if (t.squadMemberId){
+  if (t.squadMemberId){
       const sm = await prisma.squadMember.findUnique({ where: { id: t.squadMemberId } });
       if (sm){
-        const val = Math.min(STAT_CAP, (sm as any)[stat] + TRAIN_GAIN);
-        await prisma.squadMember.update({ where: { id: sm.id }, data: { [stat]: val } });
+        const val  = Math.min(STAT_CAP, (sm as any)[stat] + TRAIN_GAIN);
+        const cond = Math.max(0, sm.cond - TRAIN_COND_COST);
+        await prisma.squadMember.update({ where: { id: sm.id }, data: { [stat]: val, cond } });
       }
     } else {
       const m = await prisma.worldMembership.findUnique({ where: { id: t.membershipId } });
       if (m){
-        const f = capField(stat);
-        const val = Math.min(STAT_CAP, (m as any)[f] + TRAIN_GAIN);
-        await prisma.worldMembership.update({ where: { id: m.id }, data: { [f]: val } });
+        const f    = capField(stat);
+        const val  = Math.min(STAT_CAP, (m as any)[f] + TRAIN_GAIN);
+        const cond = Math.max(0, m.capCond - TRAIN_COND_COST);
+        await prisma.worldMembership.update({ where: { id: m.id }, data: { [f]: val, capCond: cond } });
       }
     }
     await prisma.training.delete({ where: { id: t.id } });
