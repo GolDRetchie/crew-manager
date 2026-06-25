@@ -1,5 +1,5 @@
 /* ====================================================================
-   mp-fit.css  (v3) — "past altijd op het scherm"-laag voor de ONLINE
+   mp-fit.css  (v4) — "past altijd op het scherm"-laag voor de ONLINE
    competitie. ALLES gescoped op
        body[data-screen="screen-competition"] + :has(#cp-content > .cs-fit)
    zodat single-player (screen-crew/market/training) nooit geraakt wordt.
@@ -73,7 +73,8 @@ body[data-screen="screen-competition"] .ship-tool:hover{ background:rgba(11,37,5
    absoluut zodat height:100% oplost tegen de (flex-)wrapper. */
 body[data-screen="screen-competition"] .ship-col{
   position:absolute; top:50%; left:50%; margin:0;
-  height:100%; width:auto; max-width:100%;
+  height: min(100cqh, calc(100cqw * var(--ship-h,600) / var(--ship-w,330)));
+  width:auto;
   aspect-ratio: var(--ship-w,330) / var(--ship-h,600);
   transform: translate(-50%,-50%);
 }
