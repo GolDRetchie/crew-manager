@@ -231,9 +231,15 @@
   .hm-rowC{ order:2; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; } /* stats vóór missions/news */
   .hm-rowB{ order:3; grid-template-columns:minmax(0,1fr) minmax(0,1.5fr); gap:8px; }
 
+  /* brand op telefoon verbergen (bespaart hoogte; desktop houdt 'm gewoon) */
+  .hm-brand{ display:none; }
+
+  /* profiel compact: iconen op één rij, avatar NAAST de naam i.p.v. groot gecentreerd */
   .hm-prof{ padding:11px 12px; }
+  .hm-prof-ic{ flex-direction:row; }
+  .hm-prof-mid{ flex-direction:row; align-items:center; justify-content:flex-start; gap:13px; margin-top:2px; }
   .hm-av{ width:54px; height:54px; font-size:26px; }
-  .hm-name{ font-size:24px; }
+  .hm-name{ font-size:24px; text-align:left; }
   .hm-prof-bottom{ margin-top:10px; }
 
   /* stat-tegels kleiner */
