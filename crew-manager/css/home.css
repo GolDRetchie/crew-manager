@@ -229,7 +229,7 @@
   .hm-side-l{ font-size:13px; }
   .hm-side-sub{ display:none; }
   .hm-rowC{ order:2; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; } /* stats vóór missions/news */
-  .hm-rowB{ order:3; grid-template-columns:minmax(0,1fr) minmax(0,1.5fr); gap:8px; }
+  .hm-rowB{ order:3; grid-template-columns:1fr 1fr; gap:9px; }
 
   /* brand op telefoon verbergen (bespaart hoogte; desktop houdt 'm gewoon) */
   .hm-brand{ display:none; }
@@ -248,10 +248,16 @@
   .hm-stat-v{ font-size:16px; }
   .hm-stat-h{ font-size:9px; }
 
-  /* missions + newspaper kort & plat (zoals join crew / free 50) */
-  .hm-mission, .hm-news{ min-height:0; padding:8px 12px; }
-  .hm-mission-h{ font-size:14px; } .hm-mission-c{ font-size:18px; } .hm-mission-s{ font-size:10.5px; }
-  .hm-news-h{ font-size:16px; }
+  /* missions + newspaper als platte pillen, net als join crew / free 50.
+     "binnenkort"-tag + "NEWS"-badge weg; missions = "MISSIONS 0/3" op één regel;
+     newspaper = alleen de kop, compact en gecentreerd. */
+  .hm-box-tag, .hm-news-badge{ display:none; }
+  .hm-mission, .hm-news{ min-height:0; flex-direction:row; align-items:center; justify-content:center;
+    gap:8px; padding:10px 12px; }
+  .hm-mission-s{ display:none; }                 /* "Daily challenges" weg */
+  .hm-mission-h{ font-size:14px; }
+  .hm-mission-c{ font-size:16px; }
+  .hm-news-h{ font-size:12.5px; text-align:center; line-height:1.12; margin-top:0; }
 
   /* --- manager-slots: 2x2, echte vierkanten, korter --- */
   .hm-col-slots{ min-height:0; }
@@ -283,6 +289,6 @@
   .hm-stat-v{ font-size:14px; }
   .hm-stat-h{ font-size:8px; }
   .hm-mission, .hm-news{ padding:8px 11px; }
-  .hm-mission-h{ font-size:13px; } .hm-mission-c{ font-size:17px; }
-  .hm-news-h{ font-size:15px; }
+  .hm-mission-h{ font-size:13px; } .hm-mission-c{ font-size:15px; }
+  .hm-news-h{ font-size:12px; }
 }
