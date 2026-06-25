@@ -128,7 +128,6 @@ export const PIRATES: Pirate[] = [
   { n:"Jinbe",             r:"Helmsman",  p:8, d:8, s:6, c:"Straw Hat Pirates",  sp:["Fish-Man Karate","Arabesque Brick Fist","Shark Shoulder Throw"] },
   { n:"Jesus Burgess",     r:"Helmsman",  p:9, d:6, s:6, c:"Blackbeard Pirates", sp:["Champion Press"] },
   { n:"Jean Bart",         r:"Helmsman",  p:7, d:7, s:5, c:"Heart Pirates",      sp:["Heavy Swing"] },
-  { n:"Donquino",          r:"Helmsman",  p:5, d:6, s:6, c:"Free Agent", sp:[] },
   { n:"Shiki",             r:"Helmsman",  p:7, d:5, s:6, c:"Free Agent", sp:[] },
 
   // --- Crewmate ------------------------------------------------------------
