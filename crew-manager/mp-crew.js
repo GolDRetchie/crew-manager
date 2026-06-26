@@ -287,36 +287,55 @@
      Geen viewport-meting, geen resize/orientation-listeners meer. ---- */
   var SLOT_FRAC = 0.26;        // doel: kaart-breedte ≈ 26% van de dek-breedte
   var shipRO    = null;
+  var SHIPW = 330, SHIPH = 600;
 
-  function applyScale(col){
-    if (!col) return;
-    var deck = col.offsetWidth || 0;               // korte zijde van het dek (pre-transform)
-    var slot = col.querySelector(".slot");         // 1 slot = natuurlijke kaartbreedte
-    var card = slot ? slot.offsetWidth : 0;        // pre-transform -> ongeschaalde maat
-    if (!deck || !card) return;
-    var s = (SLOT_FRAC * deck) / card;
-    s = Math.max(0.45, Math.min(1.15, s));
-    content().style.setProperty("--cs-slot-scale", s.toFixed(3));
+  /* meet .ship-wrap (echte pixels) en zet daaruit de schiphoogte + kaartschaal.
+     Breedte volgt via CSS aspect-ratio; draaien/centreren is CSS. */
+  function fitShip(){
+    var col  = content().querySelector(".ship-col");
+    var wrap = content().querySelector(".ship-wrap");
+    if (!col || !wrap) return;
+    var W = wrap.clientWidth, H = wrap.clientHeight;
+    if (!W || !H) return;
+
+    var landscape = false;
+    try { landscape = window.matchMedia("(orientation: landscape)").matches; } catch (e) {}
+
+    var rHW = SHIPH / SHIPW;                       // hoogte/breedte van het dek
+    // pre-transform hoogte: staand = rechtop, liggend = de (horizontale) lange as
+    var px = landscape ? Math.min(W, H * rHW) : Math.min(H, W * rHW);
+    col.style.height = Math.floor(px) + "px";      // breedte volgt via aspect-ratio
+
+    // kaartjes-schaal: kaart ≈ SLOT_FRAC van de korte dek-zijde
+    var deck = px * (SHIPW / SHIPH);
+    var slot = col.querySelector(".slot");
+    var card = slot ? slot.offsetWidth : 0;        // pre-transform = natuurlijke breedte
+    if (deck && card){
+      var s = Math.max(0.45, Math.min(1.15, (SLOT_FRAC * deck) / card));
+      content().style.setProperty("--cs-slot-scale", s.toFixed(3));
+    }
   }
 
   function setupShipFit(){
-    var col = content().querySelector(".ship-col");
-    if (!col) return;
+    var col  = content().querySelector(".ship-col");
+    var wrap = content().querySelector(".ship-wrap");
+    if (!col || !wrap) return;
 
-    // (1) echte verhouding uit de viewBox -> CSS-vars (aspect-ratio + lig-fit)
-    var svg = col.querySelector("svg"), vw = 330, vh = 600;
-    var vb = svg && svg.getAttribute("viewBox");
-    if (vb){ var p = vb.split(/[\s,]+/); if (+p[2] > 0 && +p[3] > 0){ vw = +p[2]; vh = +p[3]; } }
-    col.style.setProperty("--ship-w", vw);
-    col.style.setProperty("--ship-h", vh);
+    // echte verhouding uit de viewBox (voor de CSS aspect-ratio + de fit-math)
+    var svg = col.querySelector("svg");
+    var vb  = svg && svg.getAttribute("viewBox");
+    SHIPW = 330; SHIPH = 600;
+    if (vb){ var p = vb.split(/[\s,]+/); if (+p[2] > 0 && +p[3] > 0){ SHIPW = +p[2]; SHIPH = +p[3]; } }
+    col.style.setProperty("--ship-w", SHIPW);
+    col.style.setProperty("--ship-h", SHIPH);
 
-    // (2) kaartjes-schaal volgt de dekbreedte
+    // herbereken bij elke maatwijziging van de wrapper (incl. draaien)
     if (shipRO) shipRO.disconnect();
     if (typeof ResizeObserver === "function"){
-      shipRO = new ResizeObserver(function (){ applyScale(col); });
-      shipRO.observe(col);
+      shipRO = new ResizeObserver(function (){ fitShip(); });
+      shipRO.observe(wrap);
     }
-    applyScale(col);
+    fitShip();
   }
 
   /* ---- drag & drop (posities; index-based) ---- */
