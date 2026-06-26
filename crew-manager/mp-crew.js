@@ -47,9 +47,9 @@
 
   /* generieke slot-posities op het bestaande schip (proven coords) */
   var GENPOS = {
-    3: [[50,30],[33,55],[67,55]],
-    7: [[27,22],[73,22],[27,37],[73,37],[27,52],[73,52],[50,66]],
-    9: [[27,22],[73,22],[27,37],[73,37],[27,52],[73,52],[50,66],[30,84],[70,84]],
+    3: [[50,26],[31,52],[69,52]],
+    7: [[28,24],[72,24],[28,44],[72,44],[28,64],[72,64],[50,82]],
+    9: [[28,22],[72,22],[28,40],[72,40],[28,58],[72,58],[28,76],[72,76],[50,90]],
   };
 
   /* tier-info (sync met server/src/config/shipTiers.ts) */
@@ -285,7 +285,7 @@
        (2) de kaartjes-schaal (--cs-slot-scale) laten meelopen met de
            werkelijke dekbreedte, via een ResizeObserver op .ship-col.
      Geen viewport-meting, geen resize/orientation-listeners meer. ---- */
-  var SLOT_FRAC = 0.26;        // doel: kaart-breedte ≈ 26% van de dek-breedte
+  var SLOT_FRAC = 0.22;        // doel: kaart-breedte ≈ 22% van de dek-breedte
   var shipRO    = null;
   var SHIPW = 330, SHIPH = 600;
 

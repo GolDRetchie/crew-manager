@@ -21,8 +21,8 @@ const SHIP_SVG =
       '<linearGradient id="deck" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d2ad72"/><stop offset="1" stop-color="#bd965f"/></linearGradient>' +
     '</defs>' +
     '<path d="M180,2 L171,22 L189,22 Z" fill="#e7b94a" stroke="#9a6b1e" stroke-width="1.5"/>' +
-    '<path d="M180,18 C116,38 64,86 56,176 L56,402 C56,462 110,490 180,490 C250,490 304,462 304,402 L304,176 C296,86 244,38 180,18 Z" fill="url(#wood)" stroke="#5e3c1c" stroke-width="6"/>' +
-    '<path d="M180,30 C124,48 80,90 72,180 L72,398 C72,452 120,476 180,476 C240,476 288,452 288,398 L288,180 C280,90 236,48 180,30 Z" fill="url(#deck)" stroke="#8a5a2b" stroke-width="2"/>' +
+    '<path d="M180,18 C116,38 64,86 56,176 L56,402 C56,462 110,490 180,490 C250,490 304,462 304,402 L304,176 C296,86 244,38 180,18 Z" fill="var(--cs-hull, #8a5a2b)" stroke="var(--cs-trim, #5e3c1c)" stroke-width="6"/>' +
+    '<path d="M180,30 C124,48 80,90 72,180 L72,398 C72,452 120,476 180,476 C240,476 288,452 288,398 L288,180 C280,90 236,48 180,30 Z" fill="var(--cs-deck, #cba066)" stroke="var(--cs-trim, #8a5a2b)" stroke-width="2"/>' +
     '<path d="M180,40 C130,56 90,96 83,182 L83,396 C83,446 126,468 180,468 C234,468 277,446 277,396 L277,182 C270,96 230,56 180,40 Z" fill="none" stroke="#a9824f" stroke-width="1.2" opacity="0.7"/>' +
     '<g stroke="#a9824f" stroke-width="1.3" opacity="0.55">' +
       '<line x1="110" y1="60" x2="110" y2="455"/><line x1="145" y1="48" x2="145" y2="466"/><line x1="180" y1="42" x2="180" y2="470"/><line x1="215" y1="48" x2="215" y2="466"/><line x1="250" y1="60" x2="250" y2="455"/>' +
