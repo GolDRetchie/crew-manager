@@ -402,10 +402,17 @@
       var r = await Api.upgradeShip(C.id);
       toast(r.discounted ? "Ship upgraded \u2014 Shipwright discount applied!" : "Ship upgraded!");
       await load();
-      // editor staat mogelijk nog open -> kaart verversen met de nieuwe tier
-      if (el("cs-editor") && el("cs-editor").classList.contains("open")) renderUpgradeCard();
+      // editor staat mogelijk nog open -> kaart + saldo verversen met de nieuwe tier
+      if (el("cs-editor") && el("cs-editor").classList.contains("open")){ renderUpgradeCard(); refreshFunds(); }
     }
     catch (e){ toast(e.message || "Upgrade failed"); if (btn) btn.disabled = false; }
+  }
+
+  function refreshFunds(){
+    var box = el("cs-ed-funds"); if (!box) return;
+    var f = shipFunds();
+    box.textContent = (f == null) ? "\u0E3F \u2014" : berries(f);
+    box.classList.toggle("unknown", f == null);
   }
 
   /* upgrade-kaart in het bewerk-scherm (variant A) */
@@ -491,6 +498,7 @@
     var ov = document.createElement("div"); ov.className = "cs-editor"; ov.id = "cs-editor";
     ov.innerHTML =
       '<div class="cs-ed-head"><button class="btn-ghost" id="cs-ed-cancel" type="button">\u2715 Cancel</button><h2>Customize ship</h2>' +
+        '<div class="cs-ed-funds"><span>Berries</span><b id="cs-ed-funds">\u0E3F \u2014</b></div>' +
         '<div class="cs-ed-total"><span>Total</span><b id="cs-ed-total">\u0E3F 0</b></div><button class="cs-ed-finish" id="cs-ed-finish" type="button">Finish</button></div>' +
       '<div class="cs-upg" id="cs-upg-card"></div>' +
       '<div class="cs-ed-body">' +
@@ -522,7 +530,7 @@
     C.original = packShip(C.ship); C.edit = packShip(C.ship); C.edView = "side";
     el("cs-view").textContent = "\u21C5 Top view";
     el("cs-summary").classList.remove("open"); closeDrawer();
-    renderEditorShip(); refreshTotal(); renderUpgradeCard();
+    renderEditorShip(); refreshTotal(); renderUpgradeCard(); refreshFunds();
     el("cs-editor").classList.add("open");
   }
   function toggleView(){
@@ -585,7 +593,7 @@
     var ch = getChanges(); if (!ch.length){ closeEditorOverlay(); return; }
     var changes = {}; ch.forEach(function (c){ changes[c.field] = C.edit[c.field]; });
     var pay = el("cs-pay"); if (pay) pay.disabled = true;
-    try { var r = await Api.saveCosmetics(C.id, changes); C.ship = r.ship || C.ship; applyShip(C.ship); closeEditorOverlay(); toast("Ship updated \u2713"); render(); }
+    try { var r = await Api.saveCosmetics(C.id, changes); C.ship = r.ship || C.ship; applyShip(C.ship); refreshFunds(); closeEditorOverlay(); toast("Ship updated \u2713"); render(); }
     catch (e){ toast(e.message || "Couldn\u2019t save look"); if (pay) pay.disabled = false; }
   }
   function cancelEditor(){ C.edit = packShip(C.original); applyShip(C.original); closeEditorOverlay(); }
@@ -617,6 +625,7 @@
       ".cs-ed-head{display:flex;align-items:center;gap:11px;padding:12px 15px;border-bottom:1px solid rgba(255,255,255,.12);}",
       ".cs-ed-head h2{margin:0;flex:1;font-weight:700;font-style:italic;letter-spacing:.04em;text-transform:uppercase;font-size:16px;color:#f3e9d6;}",
       ".cs-ed-total{text-align:right;line-height:1;}.cs-ed-total span{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#aa9c80;}.cs-ed-total b{display:block;font-weight:700;font-size:15px;color:#e9c46a;}",
+      ".cs-ed-funds{text-align:right;line-height:1;}.cs-ed-funds span{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#aa9c80;}.cs-ed-funds b{display:block;font-weight:700;font-size:15px;color:#f3e9d6;}.cs-ed-funds b.unknown{color:#aa9c80;font-style:italic;}",
       ".cs-ed-finish{cursor:pointer;font:inherit;font-weight:700;color:#2a1c05;background:#e9c46a;border:0;border-radius:10px;padding:8px 14px;}.cs-ed-finish:disabled{opacity:.6;}",
       /* ---- upgrade-kaart (variant A) in de editor ---- */
       ".cs-upg{margin:10px 12px 0;background:var(--parch,#f1e2be);border:2px solid var(--line,#8a5a2b);border-radius:14px;padding:12px 13px 11px;box-shadow:0 8px 22px rgba(0,0,0,.34),inset 0 0 0 2px rgba(138,90,43,.14);flex:0 0 auto;}",
