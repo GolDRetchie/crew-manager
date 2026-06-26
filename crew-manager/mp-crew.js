@@ -211,8 +211,7 @@
     var cur = (C.ship && C.ship.shipTier) || 1, info = NEXT_TIER[cur + 1];
     if (!info) return false;
     var price = crewHasShipwright() ? Math.round(info.price * (1 - SHIPWRIGHT_DISCOUNT)) : info.price;
-    var funds = (C.ship && C.ship.funds != null) ? C.ship.funds
-              : (C.data && C.data.funds != null ? C.data.funds : null);
+    var funds = shipFunds();
     return (funds == null) ? true : (funds >= price);   // bij onbekende funds niet blokkeren
   }
 
@@ -382,8 +381,9 @@
     }));
   }
   function shipFunds(){
-    if (C.ship && C.ship.funds != null) return C.ship.funds;
-    if (C.data && C.data.funds != null) return C.data.funds;
+    var srcs = [C.ship, C.data], keys = ["funds","berries","balance","beli","gold","coins","money"];
+    for (var i = 0; i < srcs.length; i++){ var o = srcs[i]; if (!o) continue;
+      for (var k = 0; k < keys.length; k++){ if (o[keys[k]] != null) return o[keys[k]]; } }
     return null;
   }
   function doUpgrade(){
@@ -426,8 +426,9 @@
     host.className = "cs-upg";
     var hasSW  = crewHasShipwright();
     var price  = hasSW ? Math.round(info.price * (1 - SHIPWRIGHT_DISCOUNT)) : info.price;
-    var afford = canAfford();
     var funds  = shipFunds();
+    var known  = (funds != null);
+    var afford = !known || (funds >= price);   // onbekend saldo -> niet blokkeren
     var curCap = (C.data && C.data.rosterCap != null) ? C.data.rosterCap
                : (NEXT_TIER[cur] ? NEXT_TIER[cur].cap : 3);
     var newCap = info.cap;
@@ -436,12 +437,15 @@
       ? '<span class="cs-upg-was">' + berries(info.price) + '</span>' + berries(price)
       : berries(price);
 
+    var balHtml = known
+      ? '<span class="cs-upg-bal' + (afford ? '' : ' short') + '">You have ' + berries(funds) + '</span>'
+      : '<span class="cs-upg-bal unknown">Balance unavailable</span>';
+
     var bottom = afford
       ? (hasSW
           ? '<div class="cs-upg-req"><span class="ok">\u2713</span> Shipwright aboard \u2014 30% off.</div>'
           : '<div class="cs-upg-req"><span class="hint">\u2693</span> Add a Shipwright to your crew for 30% off.</div>')
-      : '<div class="cs-upg-req"><span class="no">\u2715</span> Not enough berries' +
-          (funds != null ? ' (need ' + berries(price - funds) + ' more).' : '.') + '</div>';
+      : '<div class="cs-upg-req"><span class="no">\u2715</span> Not enough berries (need ' + berries(price - funds) + ' more).</div>';
 
     var btn = '<button class="cs-upg-btn" id="cs-upg" type="button"' + (afford ? '' : ' disabled') + '>Upgrade</button>';
 
@@ -460,13 +464,23 @@
       '</div>' +
       '<div class="cs-upg-foot">' +
         '<div class="cs-upg-cost"><span class="cs-upg-cost-l">Cost</span>' +
-          '<span class="cs-upg-cost-v' + (afford ? '' : ' short') + '">' + costHtml + '</span></div>' +
+          '<span class="cs-upg-cost-v' + (afford ? '' : ' short') + '">' + costHtml + '</span>' +
+          balHtml +
+        '</div>' +
         btn +
       '</div>' +
       bottom;
 
+    // Inline bevestiging (geen externe modal -> die viel achter de editor-overlay).
     var b = el("cs-upg");
-    if (b && afford) b.addEventListener("click", doUpgrade);
+    if (b && afford){
+      b.addEventListener("click", function (){
+        if (b.dataset.armed === "1"){ confirmUpgrade(); return; }
+        b.dataset.armed = "1"; b.classList.add("armed"); b.textContent = "Tap to confirm";
+        clearTimeout(b._t);
+        b._t = setTimeout(function (){ b.dataset.armed = ""; b.classList.remove("armed"); b.textContent = "Upgrade"; }, 3500);
+      });
+    }
   }
 
   /* ====================================================================
@@ -626,10 +640,14 @@
       ".cs-upg-cost-l{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-2,#6b4a26);}",
       ".cs-upg-cost-v{font-family:var(--display,'Bangers',cursive);font-size:20px;letter-spacing:.5px;color:var(--gold-d,#9a6b1e);line-height:1;}",
       ".cs-upg-cost-v.short{color:var(--danger,#a3331f);}",
+      ".cs-upg-bal{display:block;font-size:11px;color:var(--ink-2,#6b4a26);margin-top:3px;}",
+      ".cs-upg-bal.short{color:var(--danger,#a3331f);font-weight:600;}",
+      ".cs-upg-bal.unknown{font-style:italic;color:var(--muted,#9a7b4a);}",
       ".cs-upg-was{font-size:12px;color:var(--muted,#9a7b4a);text-decoration:line-through;margin-right:5px;}",
       ".cs-upg-btn{margin-left:auto;flex:0 0 auto;font-family:var(--display,'Bangers',cursive);font-size:16px;letter-spacing:.5px;color:var(--ink,#3a2708);background:linear-gradient(180deg,var(--gold-hi,#f4cf6a),var(--gold,#e7b94a));border:2px solid var(--gold-d,#9a6b1e);border-radius:11px;padding:10px 24px;cursor:pointer;box-shadow:0 4px 0 var(--gold-d,#9a6b1e);}",
       ".cs-upg-btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--gold-d,#9a6b1e);}",
       ".cs-upg-btn:disabled{filter:grayscale(.5) brightness(.97);opacity:.55;cursor:not-allowed;box-shadow:0 4px 0 var(--gold-d,#9a6b1e);}",
+      ".cs-upg-btn.armed{background:linear-gradient(180deg,#f0a93f,var(--gold-d,#9a6b1e));color:#fff;}",
       ".cs-upg-req{font-size:11px;font-style:italic;color:var(--ink-2,#6b4a26);margin-top:9px;display:flex;align-items:center;gap:6px;}",
       ".cs-upg-req .ok{color:#1f7a4d;font-style:normal;}.cs-upg-req .no{color:var(--danger,#a3331f);font-style:normal;}.cs-upg-req .hint{color:var(--gold-d,#9a6b1e);font-style:normal;}",
       ".cs-upg.maxed{text-align:center;}",
