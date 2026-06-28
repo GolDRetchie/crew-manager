@@ -23,8 +23,6 @@
   function short(n){ return (typeof fmtShort === "function") ? fmtShort(n) : (Math.round((n || 0) / 1e6) + "M"); }
   function col(n){ return (typeof colorFor === "function") ? colorFor(n || "?") : "#8a5a2b"; }
   function ini(n){ return (typeof initial === "function") ? initial(n || "?") : "?"; }
-  function mini(label, val){ return (typeof miniStat === "function") ? miniStat(label, val) :
-    '<div class="mini-stat"><span class="mini-stat__label">' + label + '</span><span class="mini-stat__val">' + val + '</span></div>'; }
   function berries(n){ return "\u0E3F " + (n || 0).toLocaleString("en-US"); }
 
   function activateScreen(id){
@@ -43,7 +41,6 @@
   }
 
   var SHIP  = (typeof SHIP_SVG  !== "undefined") ? SHIP_SVG : "";
-  var BAG_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V5a3 3 0 0 1 6 0v1"/><path d="M5 9.5C5 7.6 6.6 6 8.5 6h7C17.4 6 19 7.6 19 9.5V18a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z"/><path d="M5 12h14"/><path d="M12 12v3"/></svg>';
 
   /* generieke slot-posities op het bestaande schip (proven coords) */
   var GENPOS = {
@@ -171,13 +168,6 @@
     render();
   }
 
-  function totalBounty(){
-    var cs = C.data.captainStats || { p: 8, d: 8, s: 8 };
-    var b = (cs.p + cs.d + cs.s) * 1e6;
-    (C.data.squad || []).forEach(function (m){ b += (m.p + m.d + m.s) * 1e6; });
-    return b;
-  }
-
   function ccm(m){
     return window.CrewCard ? CrewCard.member(m)
       : ('<div class="cc-nm">' + esc(m && m.name || "") + '</div>');
@@ -233,13 +223,7 @@
 
     content().innerHTML =
       '<div class="cs-fit">' +
-      '<div class="cw-top">' +
-        '<div class="cw-id"><div class="cw-av" style="background:' + col(d.captain) + '">' + ini(d.captain) + '</div>' +
-          '<div><div class="cw-crew">' + esc(d.crewName) + '</div><div class="cw-cap">Captain ' + esc(d.captain) + '</div></div></div>' +
-        '<div class="cw-bal">' + mini("Bounty", short(totalBounty())) + mini("Crew", (roster.length + 1) + " / " + (cap + 1)) + '</div>' +
-        '<button class="cw-bag" id="cs-bag" type="button" aria-label="Open inventory" title="Open your backpack">' + BAG_ICON + '</button>' +
-        '<button class="btn-ghost cw-back" id="cs-back" type="button">Back</button>' +
-      '</div>' +
+      '<div id="cs-topbar"></div>' +
       '<div class="cw-main">' +
         '<div class="ship-wrap">' +
           '<div class="ship-tools">' +
@@ -253,12 +237,12 @@
         '</div>' +
       '</div>';
 
-    el("cs-back").addEventListener("click", function (){ if (typeof window.cmOpenLeague === "function") window.cmOpenLeague(C.id); });
-    var bag = el("cs-bag");
-    if (bag) bag.addEventListener("click", function (){
-      if (typeof window.cmOpenInventory === "function") window.cmOpenInventory(C.id);
-      else toast("Inventory is not available yet");
-    });
+    if (window.cmTopbar){
+      window.cmTopbar.mount(el("cs-topbar"), C.id, {
+        title: "Crew & line-up",
+        onBack: function (){ if (typeof window.cmOpenLeague === "function") window.cmOpenLeague(C.id); }
+      });
+    }
     var brush = el("cs-brush"); if (brush) brush.addEventListener("click", openEditor);   // kwast -> bewerk-scherm (met upgrade-kaart)
     content().querySelectorAll("[data-drag]").forEach(function (e){ e.addEventListener("pointerdown", onDragStart); });
     setupShipFit();
@@ -381,6 +365,10 @@
     }));
   }
   function shipFunds(){
+    if (window.cmTopbar && typeof window.cmTopbar.funds === "function"){
+      var tf = window.cmTopbar.funds();
+      if (tf != null) return tf;
+    }
     var srcs = [C.ship, C.data], keys = ["funds","berries","balance","beli","gold","coins","money"];
     for (var i = 0; i < srcs.length; i++){ var o = srcs[i]; if (!o) continue;
       for (var k = 0; k < keys.length; k++){ if (o[keys[k]] != null) return o[keys[k]]; } }
@@ -402,6 +390,7 @@
       var r = await Api.upgradeShip(C.id);
       toast(r.discounted ? "Ship upgraded \u2014 Shipwright discount applied!" : "Ship upgraded!");
       await load();
+      if (window.cmTopbar && typeof window.cmTopbar.refresh === "function"){ try { await window.cmTopbar.refresh(C.id); } catch (e) {} }
       // editor staat mogelijk nog open -> kaart + saldo verversen met de nieuwe tier
       if (el("cs-editor") && el("cs-editor").classList.contains("open")){ renderUpgradeCard(); refreshFunds(); }
     }
@@ -593,7 +582,9 @@
     var ch = getChanges(); if (!ch.length){ closeEditorOverlay(); return; }
     var changes = {}; ch.forEach(function (c){ changes[c.field] = C.edit[c.field]; });
     var pay = el("cs-pay"); if (pay) pay.disabled = true;
-    try { var r = await Api.saveCosmetics(C.id, changes); C.ship = r.ship || C.ship; applyShip(C.ship); refreshFunds(); closeEditorOverlay(); toast("Ship updated \u2713"); render(); }
+    try { var r = await Api.saveCosmetics(C.id, changes); C.ship = r.ship || C.ship; applyShip(C.ship);
+      if (window.cmTopbar && typeof window.cmTopbar.refresh === "function"){ try { await window.cmTopbar.refresh(C.id); } catch (e) {} }
+      refreshFunds(); closeEditorOverlay(); toast("Ship updated \u2713"); render(); }
     catch (e){ toast(e.message || "Couldn\u2019t save look"); if (pay) pay.disabled = false; }
   }
   function cancelEditor(){ C.edit = packShip(C.original); applyShip(C.original); closeEditorOverlay(); }
