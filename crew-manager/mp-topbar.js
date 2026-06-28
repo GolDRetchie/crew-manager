@@ -26,7 +26,6 @@
   function short(n){ return (typeof fmtShort === "function") ? fmtShort(n) : (Math.round((n || 0) / 1e6) + "M"); }
   function colOf(n){ return (typeof colorFor === "function") ? colorFor(n || "?") : "#1f6f4a"; }
   function iniOf(n){ return (typeof initial === "function") ? initial(n || "?") : "?"; }
-  function berries(n){ return "\u0E3F " + short(n); }
 
   function activateScreen(id){
     try { if (typeof showScreen === "function") showScreen(id); } catch (e) {}
@@ -73,6 +72,9 @@
   }
 
   /* ---- bar HTML ---- */
+  var PEOPLE_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.1"/><path d="M3.5 19c0-3.2 2.6-4.8 5.5-4.8S14.5 15.8 14.5 19z"/><circle cx="17" cy="9" r="2.5"/><path d="M15.6 14.3c2.5.2 4.4 1.5 4.4 4.7h-3.6z"/></svg>';
+  function pill(cls, ic, val){ return '<span class="cmtb-pill ' + cls + '"><span class="cmtb-pill-ic">' + ic + '</span>' + val + '</span>'; }
+
   function barHtml(d, opts){
     var crewName = (d && d.crewName) || "Your crew";
     var cap      = (d && d.captain) || "";
@@ -85,26 +87,28 @@
       ? '<button class="cmtb-back" type="button" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>'
       : '';
 
-    var stat = function (l, v, cls){ return '<div class="cmtb-stat"><span class="cmtb-stat-l">' + l + '</span><span class="cmtb-stat-v' + (cls ? ' ' + cls : '') + '">' + v + '</span></div>'; };
+    var pills =
+      '<div class="cmtb-pills">' +
+        pill("berries", "\u0E3F", fundsV == null ? "\u2014" : short(fundsV)) +
+        pill("crew", PEOPLE_SVG, size == null ? "\u2014" : ((size + 1) + " / " + (capCap + 1))) +
+        pill("bounty", "\u2620", bounty == null ? "\u2014" : short(bounty)) +
+      '</div>';
+
+    // bag + bell zijn 'optioneel' (verborgen op staand); menu altijd zichtbaar
+    var acts =
+      '<div class="cmtb-acts">' +
+        '<button class="cmtb-ic cmtb-opt cmtb-bag" type="button" aria-label="Inventory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V5a3 3 0 0 1 6 0v1"/><path d="M5 9.5C5 7.6 6.6 6 8.5 6h7C17.4 6 19 7.6 19 9.5V18a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z"/><path d="M5 12h14"/><path d="M12 12v3"/></svg></button>' +
+        '<button class="cmtb-ic cmtb-opt cmtb-bell" type="button" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>' +
+        '<button class="cmtb-ic cmtb-menu" type="button" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>' +
+      '</div>';
 
     var bar =
-      '<div class="cmtb-bar">' +
+      '<div class="cmtb-bar' + (opts.primary ? '' : ' cmtb--sub') + '">' +
         '<div class="cmtb-id">' + back +
           '<div class="cmtb-emblem" style="background:' + colOf(crewName) + '">' + iniOf(crewName) + photo(cap) + '</div>' +
-          '<div class="cmtb-id-main">' +
-            '<div class="cmtb-crew">' + esc(crewName) + '</div>' +
-            '<div class="cmtb-stats">' +
-              stat("Berries", fundsV == null ? "\u0E3F \u2014" : berries(fundsV), "berries") +
-              stat("Crew", size == null ? "\u2014" : ((size + 1) + " / " + (capCap + 1))) +
-              stat("Bounty", bounty == null ? "\u2014" : short(bounty)) +
-            '</div>' +
-          '</div>' +
+          '<div class="cmtb-name">' + esc(crewName) + '</div>' +
         '</div>' +
-        '<div class="cmtb-acts">' +
-          '<button class="cmtb-ic cmtb-bag" type="button" aria-label="Inventory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V5a3 3 0 0 1 6 0v1"/><path d="M5 9.5C5 7.6 6.6 6 8.5 6h7C17.4 6 19 7.6 19 9.5V18a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z"/><path d="M5 12h14"/><path d="M12 12v3"/></svg></button>' +
-          '<button class="cmtb-ic cmtb-bell" type="button" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>' +
-          '<button class="cmtb-ic cmtb-menu" type="button" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>' +
-        '</div>' +
+        pills + acts +
       '</div>';
 
     var ctx = opts.title
@@ -309,25 +313,29 @@
     if (el("cmtb-styles")) return;
     var css = document.createElement("style"); css.id = "cmtb-styles";
     css.textContent = [
-      ".cmtb-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 4px 12px;border-bottom:1px solid rgba(241,226,190,.18);}",
-      ".cmtb-id{display:flex;align-items:center;gap:12px;min-width:0;}",
+      ".cmtb-bar{display:flex;align-items:center;gap:13px;flex-wrap:wrap;padding:10px 4px 12px;border-bottom:1px solid rgba(241,226,190,.18);}",
+      ".cmtb-id{display:flex;align-items:center;gap:11px;min-width:0;}",
       ".cmtb-back{width:42px;height:42px;flex:0 0 auto;border-radius:11px;border:2px solid var(--line);background:var(--parch-3);color:var(--ink-2);display:flex;align-items:center;justify-content:center;cursor:pointer;}",
       ".cmtb-back:hover{background:var(--parch-2);}.cmtb-back svg{width:20px;height:20px;}",
-      ".cmtb-emblem{position:relative;width:48px;height:48px;flex:0 0 auto;border-radius:12px;color:#fff;font-family:var(--display);font-size:24px;display:flex;align-items:center;justify-content:center;border:2px solid var(--gold-d);box-shadow:inset 0 -4px 0 rgba(0,0,0,.22);overflow:hidden;}",
+      ".cmtb-emblem{position:relative;width:46px;height:46px;flex:0 0 auto;border-radius:12px;color:#fff;font-family:var(--display);font-size:23px;display:flex;align-items:center;justify-content:center;border:2px solid var(--gold-d);box-shadow:inset 0 -4px 0 rgba(0,0,0,.22);overflow:hidden;}",
       ".cmtb-emblem img,.cmtb-emblem svg,.cmtb-emblem canvas,.cmtb-emblem picture,.cmtb-emblem image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;}",
-      ".cmtb-id-main{min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 16px;}",
-      ".cmtb-crew{font-family:var(--display);font-size:22px;letter-spacing:.5px;color:var(--parch);text-shadow:0 2px 0 rgba(0,0,0,.3);line-height:1;}",
-      ".cmtb-stats{display:flex;gap:16px;}",
-      ".cmtb-stat{display:flex;flex-direction:column;}",
-      ".cmtb-stat-l{font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:rgba(241,226,190,.55);}",
-      ".cmtb-stat-v{font-family:var(--display);font-size:16px;color:var(--parch);line-height:1.1;}",
-      ".cmtb-stat-v.berries{color:var(--gold-hi);}",
-      ".cmtb-acts{display:flex;gap:9px;flex:0 0 auto;}",
+      ".cmtb-name{font-family:var(--display);font-size:23px;letter-spacing:.5px;color:var(--parch);text-shadow:0 2px 0 rgba(0,0,0,.3);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}",
+      ".cmtb-pills{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}",
+      ".cmtb-pill{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-family:var(--display);font-size:15px;letter-spacing:.4px;color:var(--parch);background:rgba(255,255,255,.06);border:1px solid rgba(241,226,190,.16);border-radius:999px;padding:3px 12px 3px 4px;}",
+      ".cmtb-pill-ic{width:21px;height:21px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-size:12px;color:#fff;}",
+      ".cmtb-pill-ic svg{width:13px;height:13px;}",
+      ".cmtb-pill.berries{color:var(--gold-hi);}",
+      ".cmtb-pill.berries .cmtb-pill-ic{background:linear-gradient(180deg,var(--gold-hi),var(--gold-d));color:#3a2708;font-family:var(--body);font-weight:700;}",
+      ".cmtb-pill.crew .cmtb-pill-ic{background:#1f6f6a;}",
+      ".cmtb-pill.bounty .cmtb-pill-ic{background:#241b10;color:var(--gold-hi);}",
+      ".cmtb-acts{margin-left:auto;display:flex;gap:9px;flex:0 0 auto;}",
       ".cmtb-ic{position:relative;width:42px;height:42px;border-radius:11px;border:2px solid var(--line);background:var(--parch-3);color:var(--ink-2);display:flex;align-items:center;justify-content:center;cursor:pointer;}",
       ".cmtb-ic:hover{background:var(--parch-2);}.cmtb-ic svg{width:21px;height:21px;}",
       ".cmtb-ctx{display:flex;align-items:baseline;gap:12px;padding:11px 2px 0;}",
       ".cmtb-title{font-family:var(--display);font-size:21px;letter-spacing:.5px;color:var(--parch);text-shadow:0 2px 0 rgba(0,0,0,.3);line-height:1;}",
       ".cmtb-sub{font-size:12.5px;color:rgba(241,226,190,.6);font-style:italic;}",
+      /* STAAND: optionele iconen (rugzak/bel) weg -> alleen menu; home houdt naam (pills eigen regel), sub verbergt naam+emblem */
+      "@media (orientation: portrait){ .cmtb-ic.cmtb-opt{display:none;} .cmtb-bar:not(.cmtb--sub) .cmtb-acts{order:2;} .cmtb-bar:not(.cmtb--sub) .cmtb-pills{order:3;flex-basis:100%;padding-left:57px;} .cmtb--sub .cmtb-name,.cmtb--sub .cmtb-emblem{display:none;} }",
       /* menu */
       ".cmtb-menu-pop{position:absolute;z-index:1200;min-width:226px;max-height:calc(100vh - 80px);overflow:auto;padding:6px;background:var(--parch);border:2px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.45);scrollbar-width:none;}",
       ".cmtb-menu-pop::-webkit-scrollbar{display:none;}",
