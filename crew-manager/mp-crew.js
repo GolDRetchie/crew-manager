@@ -152,7 +152,9 @@
     C.id = worldId || C.id;
     activateScreen("screen-competition");
     injectCss();
-    content().innerHTML = '<div class="wl-head"><div><div class="cp-title">Crew &amp; line-up</div><div class="cp-subt">Loading\u2026</div></div></div>';
+    content().innerHTML = (typeof window.cmLoader === "function")
+      ? window.cmLoader("Rallying the crew")
+      : '<div class="wl-head"><div><div class="cp-title">Crew &amp; line-up</div><div class="cp-subt">Loading\u2026</div></div></div>';
     load();
   };
 

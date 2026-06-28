@@ -29,9 +29,9 @@
       (sub ? '<div class="cp-subt">' + esc(sub) + '</div>' : '') + '</div></div>';
   }
 
-  function wireBack(){
+  function wireBack(fn){
     var b = el("cp-back");
-    if (b) b.addEventListener("click", function (){
+    if (b) b.addEventListener("click", fn || function (){
       if (typeof window.cmOpenWorlds === "function") window.cmOpenWorlds();
       else activateScreen("screen-worlds");
     });
@@ -94,7 +94,7 @@
     }
 
     content().innerHTML = html;
-    wireBack();
+    wireBack(function (){ if (typeof window.cmOpenLeague === "function") window.cmOpenLeague(worldId); });
   }
 
   window.cmOpenCompetition = function (worldId){
