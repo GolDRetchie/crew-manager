@@ -94,7 +94,7 @@
         pill("bounty", "\u2620", bounty == null ? "\u2014" : short(bounty)) +
       '</div>';
 
-    // bag + bell zijn 'optioneel' (verborgen op staand); menu altijd zichtbaar
+    // bag + bell: zichtbaar op de home en op liggend; alleen verborgen op smalle sub-schermen (staand)
     var acts =
       '<div class="cmtb-acts">' +
         '<button class="cmtb-ic cmtb-opt cmtb-bag" type="button" aria-label="Inventory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6V5a3 3 0 0 1 6 0v1"/><path d="M5 9.5C5 7.6 6.6 6 8.5 6h7C17.4 6 19 7.6 19 9.5V18a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z"/><path d="M5 12h14"/><path d="M12 12v3"/></svg></button>' +
@@ -313,7 +313,7 @@
     if (el("cmtb-styles")) return;
     var css = document.createElement("style"); css.id = "cmtb-styles";
     css.textContent = [
-      ".cmtb-bar{display:flex;align-items:center;gap:13px;flex-wrap:wrap;padding:10px 4px 12px;border-bottom:1px solid rgba(241,226,190,.18);}",
+      ".cmtb-bar{display:flex;align-items:center;gap:11px;row-gap:11px;flex-wrap:wrap;padding:11px 4px 12px;border-bottom:1px solid rgba(241,226,190,.18);}",
       ".cmtb-id{display:flex;align-items:center;gap:11px;min-width:0;}",
       ".cmtb-back{width:42px;height:42px;flex:0 0 auto;border-radius:11px;border:2px solid var(--line);background:var(--parch-3);color:var(--ink-2);display:flex;align-items:center;justify-content:center;cursor:pointer;}",
       ".cmtb-back:hover{background:var(--parch-2);}.cmtb-back svg{width:20px;height:20px;}",
@@ -335,7 +335,7 @@
       ".cmtb-title{font-family:var(--display);font-size:21px;letter-spacing:.5px;color:var(--parch);text-shadow:0 2px 0 rgba(0,0,0,.3);line-height:1;}",
       ".cmtb-sub{font-size:12.5px;color:rgba(241,226,190,.6);font-style:italic;}",
       /* STAAND: optionele iconen (rugzak/bel) weg -> alleen menu; home houdt naam (pills eigen regel), sub verbergt naam+emblem */
-      "@media (orientation: portrait){ .cmtb-ic.cmtb-opt{display:none;} .cmtb-bar:not(.cmtb--sub) .cmtb-acts{order:2;} .cmtb-bar:not(.cmtb--sub) .cmtb-pills{order:3;flex-basis:100%;padding-left:57px;} .cmtb--sub .cmtb-name,.cmtb--sub .cmtb-emblem{display:none;} }",
+      "@media (orientation: portrait){ .cmtb--sub .cmtb-ic.cmtb-opt{display:none;} .cmtb-bar:not(.cmtb--sub) .cmtb-id{flex:1 1 auto;} .cmtb-bar:not(.cmtb--sub) .cmtb-acts{order:2;} .cmtb-bar:not(.cmtb--sub) .cmtb-pills{order:3;flex-basis:100%;padding-left:0;} .cmtb--sub .cmtb-name,.cmtb--sub .cmtb-emblem{display:none;} }",
       /* menu */
       ".cmtb-menu-pop{position:absolute;z-index:1200;min-width:226px;max-height:calc(100vh - 80px);overflow:auto;padding:6px;background:var(--parch);border:2px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.45);scrollbar-width:none;}",
       ".cmtb-menu-pop::-webkit-scrollbar{display:none;}",
