@@ -52,14 +52,16 @@
   };
 
   /* ---- gedeelde topbar (sub-modus) + body-wrapper ---- */
-  function mountTopbar(sub){
+  function mountTopbar(sub, infoHtml){
     var host = el("tr-topbar");
     if (host && window.cmTopbar) {
-      cmTopbar.mount(host, T.id, {
+      var opts = {
         title: "Training grounds",
         sub: sub,
         onBack: function (){ stop(); if (typeof window.cmOpenLeague === "function") window.cmOpenLeague(T.id); }
-      });
+      };
+      if (infoHtml) opts.info = { key: "training", title: "Training grounds", html: infoHtml };
+      cmTopbar.mount(host, T.id, opts);
     }
   }
   function shell(bodyHtml, sub){
@@ -202,21 +204,22 @@
     var open = openByStat();
     var totalOpen = STATS.reduce(function (n, s){ return n + open[s]; }, 0);
     var canAuto = totalOpen > 0 && avail.length > 0;
-
     var sub = (d.active ? d.active.length : 0) + "/" + (d.slotsTotal || 6) + " slots in training";
 
+    var infoHtml =
+      '<p>Tap a field slot then a crewmate \u2014 or a crewmate then a slot, or hit <b>Auto-fill</b> to put each crewmate in their lowest stat.</p>' +
+      '<p>Each session takes <b>6 hours</b> and adds <b>+' + (d.gain || 3) + '</b> to that stat. Up to <b>2 per stat</b>, 6 in total. Training runs even while you\u2019re away.</p>';
+
     var body =
-      '<div class="tg-toolbar">' +
-        '<button class="btn-gold-sm" id="tr-auto" type="button"' + (canAuto ? "" : " disabled") + '>Auto-fill lowest stat</button>' +
-      '</div>' +
-      '<p class="tg-intro">Tap a field slot then a crewmate \u2014 or a crewmate then a slot, or hit <b>Auto-fill</b> to put each crewmate in their lowest stat. Each session takes <b>6 hours</b> and adds +' +
-        (d.gain || 3) + ' to that stat. Up to 2 per stat, 6 in total. Training runs even while you\u2019re away.</p>' +
       '<div class="tcols">' + cols + '</div>' +
+      '<div class="tg-autobar">' +
+        '<button class="btn-gold-sm" id="tr-auto" type="button"' + (canAuto ? "" : " disabled") + '>Auto-fill</button>' +
+      '</div>' +
       '<div class="tg-avail-t">Available crew</div>' +
       '<div class="tg-avail">' + chips + '</div>';
 
     content().innerHTML = '<div id="tr-topbar"></div><div class="tg-wrap">' + body + '</div>';
-    mountTopbar(sub);
+    mountTopbar(sub, infoHtml);
 
     var auto = el("tr-auto"); if (auto) auto.addEventListener("click", autoFill);
 
@@ -288,9 +291,7 @@
       ".tg-wrap{container-type:inline-size;padding:12px 12px 18px;}",
       ".tg-wrap .tg-loading,.tg-wrap .tg-err{padding:26px 14px;text-align:center;font-style:italic;color:var(--muted);font-size:14px;}",
       ".tg-wrap .tg-err{color:var(--danger);}",
-      ".tg-wrap .tg-toolbar{display:flex;justify-content:flex-end;margin-bottom:10px;}",
-      ".tg-wrap .tg-intro{font-size:13px;line-height:1.55;color:rgba(241,226,190,.85);margin:0 0 14px;max-width:64ch;}",
-      ".tg-wrap .tg-intro b{color:var(--gold-hi);}",
+      ".tg-wrap .tg-autobar{display:flex;justify-content:center;margin:14px 0 4px;}",
       ".tg-wrap .tcols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}",
       ".tg-wrap .tcol{display:flex;flex-direction:column;gap:7px;min-width:0;background:linear-gradient(180deg,var(--parch-3),var(--parch));border:1.5px solid var(--line-soft);border-radius:12px;padding:8px;box-shadow:0 2px 0 rgba(0,0,0,.12);}",
       ".tg-wrap .tcol-h{font-family:var(--display);letter-spacing:.4px;font-size:15px;text-align:center;color:#fff;border-radius:8px;padding:5px 4px;line-height:1;border:1.5px solid rgba(0,0,0,.2);}",

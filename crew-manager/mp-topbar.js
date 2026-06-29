@@ -111,9 +111,12 @@
         pills + acts +
       '</div>';
 
-    var ctx = opts.title
-      ? '<div class="cmtb-ctx"><div class="cmtb-title">' + esc(opts.title) + '</div>' +
-          (opts.sub ? '<div class="cmtb-sub">' + esc(opts.sub) + '</div>' : '') + '</div>'
+    var info = (opts.info && window.cmInfo) ? cmInfo.btn(opts.info) : '';
+    var ctx = (opts.title || info)
+      ? '<div class="cmtb-ctx"><div class="cmtb-ctx-tt">' +
+          (opts.title ? '<div class="cmtb-title">' + esc(opts.title) + '</div>' : '') +
+          (opts.sub ? '<div class="cmtb-sub">' + esc(opts.sub) + '</div>' : '') +
+        '</div>' + info + '</div>'
       : '';
 
     return bar + ctx;
@@ -331,7 +334,9 @@
       ".cmtb-acts{margin-left:auto;display:flex;gap:9px;flex:0 0 auto;}",
       ".cmtb-ic{position:relative;width:42px;height:42px;border-radius:11px;border:2px solid var(--line);background:var(--parch-3);color:var(--ink-2);display:flex;align-items:center;justify-content:center;cursor:pointer;}",
       ".cmtb-ic:hover{background:var(--parch-2);}.cmtb-ic svg{width:21px;height:21px;}",
-      ".cmtb-ctx{display:flex;align-items:baseline;gap:12px;padding:11px 2px 0;}",
+      ".cmtb-ctx{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 2px 0;}",
+      ".cmtb-ctx-tt{display:flex;align-items:baseline;gap:12px;min-width:0;}",
+      ".cmtb-ctx-tt .cmtb-sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}",
       ".cmtb-title{font-family:var(--display);font-size:21px;letter-spacing:.5px;color:var(--parch);text-shadow:0 2px 0 rgba(0,0,0,.3);line-height:1;}",
       ".cmtb-sub{font-size:12.5px;color:rgba(241,226,190,.6);font-style:italic;}",
       /* STAAND: optionele iconen (rugzak/bel) weg -> alleen menu; home houdt naam (pills eigen regel), sub verbergt naam+emblem */
