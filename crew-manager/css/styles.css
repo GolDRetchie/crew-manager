@@ -1068,3 +1068,29 @@ body{ min-height:100dvh; }
   #screen-create > div:last-child{ margin-top:7px !important; }
   #screen-create .btn-ghost{ font-size:15px; padding:7px 22px; }
 }
+
+/* ====================================================================
+   Battle — responsive verticale vulling + topbalk-afkapping  (v17)
+   Fix 1: op normale/hoge schermen stond alles bovenaan met een grote
+          lege ruimte eronder. Nu: topbalk boven, stage verticaal
+          gecentreerd, knoppen onderaan -> scherm netjes gevuld.
+   Fix 2: lange crewnamen kapten niet af en duwden het embleem uit beeld.
+   Geldt voor single-player EN multiplayer (gedeelde .bt-* classes).
+   Korte landscape (max-height:600) houdt z'n eigen compacte layout.
+   ==================================================================== */
+
+/* Fix 2 — lange namen afkappen i.p.v. het embleem weg te duwen */
+.bt-nm{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* Fix 1 — alleen op normale/hoge schermen (korte landscape blijft ongemoeid) */
+@media (min-height:601px){
+  body[data-screen="screen-battle"] .app{
+    display:flex; flex-direction:column; min-height:100dvh;
+    padding-top:18px; padding-bottom:calc(20px + env(safe-area-inset-bottom));
+  }
+  body[data-screen="screen-battle"] .screen.is-active{
+    flex:1 1 auto; display:flex; flex-direction:column; min-height:0;
+  }
+  body[data-screen="screen-battle"] .bt-stage{ margin-top:auto; }
+  body[data-screen="screen-battle"] .bt-action{ margin-top:auto; margin-bottom:0; }
+}
