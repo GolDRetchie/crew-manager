@@ -68,8 +68,9 @@
       '  --cols: 30px minmax(0,1fr) 54px 40px; }',                 /* portrait: # · Crew · ☠ · Pts */
       '.lg2 #lg-body::-webkit-scrollbar{ width:0; height:0; display:none; }',
       '.lg2 #lg-body.loading{ background:transparent; border:0; box-shadow:none; margin:0; }',
+      '.lg2 .lg-inner{ max-width:880px; margin:0 auto; }',                 /* centreer de tabel op brede schermen */
 
-      '.lg2 .board-head{ position:sticky; top:0; z-index:5; background:var(--parch-3); padding:9px 11px 6px; border-bottom:1.5px solid var(--line-soft); }',
+      '.lg2 .board-head{ position:sticky; top:0; z-index:5; background:var(--parch-3); padding:10px 0 6px; border-bottom:1.5px solid var(--line-soft); border-radius:13px 13px 0 0; }',
       '.lg2 .head-top{ display:flex; align-items:center; margin:0 4px 7px; }',
       '.lg2 .head-top .cap{ font-family:var(--display); font-weight:400; letter-spacing:.4px; font-size:15px; color:var(--ink-2); }',
       '.lg2 .matchlink{ margin-left:auto; display:inline-flex; align-items:center; gap:4px; font-family:var(--body); font-weight:700; font-size:11px; color:var(--sea-light); cursor:pointer; border:0; background:transparent; }',
@@ -132,25 +133,42 @@
       '.lg2 .lg-soft{ color:var(--ink-2); padding:18px 14px; text-align:center; }',
       '.lg2 .lg-err{ color:var(--danger); padding:14px; }',
 
-      /* ---- WIDE (landscape): # · Crew · ☠ · W · G · V · Form · Pts ---- */
-      '@container (min-width:560px){',
+      /* ---- heel smal (<360px): compacter ---- */
+      '@container (max-width:359px){',
+      '  .lg2 #lg-body{ --cols: 26px minmax(0,1fr) 48px 36px; }',
+      '  .lg2 .r-emblem{ width:26px; height:26px; font-size:13px; }',
+      '  .lg2 .r-nm{ font-size:14px; }',
+      '  .lg2 .r-bty{ font-size:11px; }',
+      '  .lg2 .r-pts{ font-size:16px; }',
+      '  .lg2 .fp{ width:13px; height:13px; }',
+      '}',
+
+      /* ---- MID (>=480px): W/G/V als kolommen erbij; vorm blijft onder de naam ---- */
+      '@container (min-width:480px){',
+      '  .lg2 #lg-body{ --cols: 40px minmax(0,1fr) 70px 30px 30px 30px 54px; }',
+      '  .lg2 .thead span{ font-size:10px; }',
+      '  .lg2 .thead .h-wide.r-wdl{ display:block; }',
+      '  .lg2 .r-wdl{ display:block; }',
+      '  .lg2 .r-rank{ font-size:17px; }',
+      '  .lg2 .r-emblem{ width:33px; height:33px; }',
+      '  .lg2 .r-nm{ font-size:16px; }',
+      '  .lg2 .r-stat{ font-size:14px; }',
+      '  .lg2 .r-pts{ font-size:20px; }',
+      '}',
+
+      /* ---- WIDE (>=768px): volledige tabel incl. vorm-kolom ---- */
+      '@container (min-width:768px){',
       '  .lg2 #lg-body{ --cols: 46px minmax(0,1fr) 70px 30px 30px 30px 0px 54px; }',
       '  .lg2 #lg-body.has-form{ --cols: 46px minmax(0,1fr) 70px 30px 30px 30px 110px 54px; }',
-      '  .lg2 .board-head{ padding:11px 14px 7px; }',
-      '  .lg2 .thead span{ font-size:10px; }',
       '  .lg2 .thead .h-wide{ display:block; }',
       '  .lg2 .trow{ padding:9px 4px; gap:7px; }',
       '  .lg2 .r-rank{ font-size:18px; }',
       '  .lg2 .r-emblem{ width:34px; height:34px; font-size:16px; }',
-      '  .lg2 .r-nm{ font-size:16px; }',
       '  .lg2 .r-mgr{ font-size:11.5px; }',
       '  .lg2 .r-bty{ font-size:13px; }',
-      '  .lg2 .r-stat{ font-size:14px; }',
       '  .lg2 .r-pts{ font-size:21px; }',
       '  .lg2 .r-form{ display:none; }',
       '  .lg2 .r-formcol{ display:flex; }',
-      '  .lg2 .r-wdl{ display:block; }',
-      '  .lg2 .head-top, .lg2 .thead{ margin-left:4px; margin-right:4px; }',
       '}',
     ].join("\n");
     document.head.appendChild(s);
@@ -324,7 +342,7 @@
       }
     });
 
-    body.innerHTML = head + '<div class="tbl">' + rows + '</div>';
+    body.innerHTML = '<div class="lg-inner">' + head + '<div class="tbl">' + rows + '</div></div>';
 
     // tik-op-crew -> detail (één tegelijk)
     body.querySelectorAll(".trow").forEach(function (r){
