@@ -121,11 +121,13 @@ function renderTournament(save){
   }
 
   els.matchday.innerHTML =
-    '<div class="md-top"><span class="md-title">Laugh Tale &mdash; Grand Tournament</span>' +
-      '<button class="btn-ghost" id="tn-back" type="button" style="margin-left:auto">Back</button></div>' +
-    banner +
-    '<div class="tn-bracket">' + cols + '</div>' +
-    '<div class="tn-actions">' + action + '</div>';
+    '<div class="tn2 tn2-sp"><div class="tn2-in">' +
+      '<div class="md-top"><span class="md-title">Laugh Tale &mdash; Grand Tournament</span>' +
+        '<button class="btn-ghost" id="tn-back" type="button" style="margin-left:auto">Back</button></div>' +
+      banner +
+      '<div class="tn-bracket">' + cols + '</div>' +
+      '<div class="tn-actions">' + action + '</div>' +
+    '</div></div>';
 
   $("tn-back").addEventListener("click", () => goHome(save));
   const fb = $("tn-fight");

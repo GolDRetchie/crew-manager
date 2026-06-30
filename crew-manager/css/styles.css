@@ -585,8 +585,7 @@ body[data-screen="screen-training"] .app{ max-width:980px; }
 .av-chip:hover{ transform:translateY(-2px); filter:brightness(1.03); }
 .av-chip:active{ transform:translateY(0); }
 .av-dot{ width:11px; height:11px; border-radius:50%; flex:0 0 auto; box-shadow:inset 0 -1px 0 rgba(0,0,0,.25); }
-.av-nm{ font-family:var(--display); font-size:15px; color:var(--ink); }
-.av-by{ font-size:12px; color:var(--ink-2); }
+/* .av-nm/.av-by hier verwijderd (v26): dubbel — de versie in het League+Matchday (v8)-blok wint (identiek + superset) */
 
 @media (max-width:560px){ .tg-bal{ margin-left:0; } }
 
@@ -667,10 +666,9 @@ body[data-screen="screen-battle"] .app{ max-width:720px; }
 .bt-team-r{ justify-content:flex-end; text-align:right; }
 .bt-av{ width:46px; height:46px; border-radius:10px; display:flex; align-items:center; justify-content:center;
         font-family:var(--display); font-size:24px; color:#fff; flex:0 0 auto; box-shadow:inset 0 -3px 0 rgba(0,0,0,.25); }
-.bt-nm{ font-family:var(--display); font-size:20px; color:var(--parch); text-shadow:0 2px 0 rgba(0,0,0,.3); line-height:1.05; }
-.bt-clock{ flex:0 0 auto; background:#0d2f40; border:2px solid #e7b94a; border-radius:12px; padding:6px 14px;
-           font-family:var(--display); font-size:30px; color:#e7b94a; min-width:78px; text-align:center; box-shadow:0 0 14px rgba(231,185,74,.25); }
-.bt-min-mark{ font-size:18px; margin-left:1px; }
+.bt-nm{ font-family:var(--display); font-size:20px; color:var(--parch); text-shadow:0 2px 0 rgba(0,0,0,.3); line-height:1.05;
+        min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+/* .bt-clock/.bt-min-mark verwijderd (v17): frame gebruikt .bt-live, niet .bt-clock */
 
 .bt-stage{ display:flex; align-items:center; gap:14px; background:var(--parch); border:2px solid #8a5a2b; border-radius:16px;
            padding:16px; box-shadow:0 8px 22px rgba(0,0,0,.28); margin-bottom:12px; min-height:104px; }
@@ -697,35 +695,86 @@ body[data-screen="screen-battle"] .app{ max-width:720px; }
 
 .bt-action{ display:flex; gap:12px; justify-content:center; align-items:center; }
 .bt-cont{ width:auto; font-size:18px; padding:12px 26px; }
-@media (max-width:560px){ .bt-nm{ font-size:16px; } .bt-line{ font-size:18px; } .bt-clock{ font-size:24px; min-width:64px; } }
+@media (max-width:560px){ .bt-nm{ font-size:16px; } .bt-line{ font-size:18px; } }
 
 /* battle speed toggle active state (v10) */
 #bt-speed.on{ background:linear-gradient(180deg,#f4cf6a,#e7b94a); border-color:#9a6b1e; color:#3a2708; }
 
 /* ====================================================================
-   Grand Tournament bracket
+   Grand Tournament bracket — .tn2 shell  (v26)
+   Self-contained + genamespacet, zelfde patroon als .lg2 (competition):
+   100dvh flex-shell -> vaste header + scrollende body + vaste footer,
+   container-queries voor responsiveness. Staand én liggend: niks over de rand.
+   Gedeeld door game-tournament.js (.tn2-sp) en mp-tournament.js (.tn2-mp).
    ==================================================================== */
-.tn-banner{ font-family:var(--display); font-size:18px; color:var(--parch); background:rgba(0,0,0,.18);
-  border:1px solid rgba(241,226,190,.18); border-radius:12px; padding:10px 16px; margin:6px 0 16px; }
-.tn-banner-win{ color:#3a2708; background:linear-gradient(180deg,var(--gold-hi),var(--gold)); border-color:var(--gold-d); }
-.tn-bracket{ display:flex; gap:16px; align-items:flex-start; overflow-x:auto; padding-bottom:8px; }
-.tn-col{ flex:0 0 auto; min-width:190px; display:flex; flex-direction:column; gap:14px; justify-content:center; }
-.tn-col-h{ font-family:var(--display); font-size:14px; letter-spacing:.6px; color:var(--parch-2,#d9c79f); text-transform:uppercase; opacity:.85; }
-.tn-match{ background:var(--parch); border:1.5px solid var(--line,#d8c193); border-radius:12px; overflow:hidden; box-shadow:0 3px 0 rgba(0,0,0,.18); }
-.tn-match-you{ border-color:#2f9e54; box-shadow:0 3px 0 #1f6c3a; }
-.tn-row{ display:flex; align-items:center; gap:9px; padding:9px 12px; font-family:var(--display); font-size:16px; color:var(--ink); }
-.tn-row + .tn-row{ border-top:1px solid rgba(0,0,0,.12); }
-.tn-row .mk-av{ width:26px; height:26px; font-size:14px; }
-.tn-row span:nth-child(2){ flex:1; }
-.tn-win{ background:rgba(47,158,84,.16); font-weight:400; }
-.tn-win.tn-row{ color:#1f6c3a; }
-.tn-you span:nth-child(2){ text-decoration:underline; }
-.tn-tick{ color:#2f9e54; font-size:16px; }
-.tn-champ{ display:flex; align-items:center; gap:9px; font-family:var(--display); font-size:18px; color:#3a2708;
-  background:linear-gradient(180deg,var(--gold-hi),var(--gold)); border:2px solid var(--gold-d); border-radius:12px; padding:12px 14px; box-shadow:0 3px 0 var(--gold-d); }
-.tn-champ .mk-av{ width:30px; height:30px; }
-.tn-actions{ margin-top:20px; text-align:center; }
-@media (max-width:560px){ .tn-bracket{ gap:10px; } .tn-col{ min-width:150px; } }
+
+/* .tn2 mag het scherm bezitten; renders ZONDER .tn2 (fixtures e.d.) blijven ongemoeid */
+.app:has(.screen.is-active .tn2){ max-width:none; padding:0; }
+.wl-wrap:has(.tn2){ max-width:none; padding:0; margin:0; }
+
+.tn2{ height:100dvh; display:flex; flex-direction:column; overflow:hidden; font-family:var(--body); color:var(--ink); }
+.tn2-in{
+  flex:1 1 auto; min-height:0; width:100%; max-width:980px; margin:0 auto;
+  display:flex; flex-direction:column; overflow:hidden; container-type:inline-size;
+  padding:12px max(13px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(13px, env(safe-area-inset-left));
+}
+.tn2-mp .tn2-in{ max-width:460px; }
+
+/* header (SP .md-top / MP .wl-head) + banner: vaste hoogte bovenin */
+.tn2 .md-top{ flex:0 0 auto; display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+.tn2 .md-title{ font-family:var(--display); font-size:24px; color:var(--parch); text-shadow:0 2px 0 rgba(0,0,0,.3);
+  line-height:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tn2 .wl-head{ flex:0 0 auto; margin-bottom:8px; }
+.tn2 .tn-banner{ flex:0 0 auto; font-family:var(--display); font-size:17px; color:var(--parch); background:rgba(0,0,0,.18);
+  border:1px solid rgba(241,226,190,.18); border-radius:12px; padding:9px 15px; margin:0 0 12px; }
+.tn2 .tn-banner-win{ color:var(--ink); background:linear-gradient(180deg,var(--gold-hi),var(--gold)); border-color:var(--gold-d); }
+
+/* body: bracket vult de rest en scrollt binnenin */
+.tn2 .tn-bracket{ flex:1 1 auto; min-height:0; display:flex; gap:14px; align-items:flex-start;
+  overflow:auto; scrollbar-width:none; -ms-overflow-style:none; padding-bottom:4px; }
+.tn2 .tn-bracket::-webkit-scrollbar{ width:0; height:0; display:none; }
+.tn2 .tn-col{ flex:0 0 auto; min-width:184px; display:flex; flex-direction:column; gap:13px; justify-content:center; }
+.tn2 .tn-col-h{ font-family:var(--display); font-size:13px; letter-spacing:.6px; color:#d9c79f; text-transform:uppercase; opacity:.9; }
+.tn2 .tn-match{ background:var(--parch); border:1.5px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:0 3px 0 rgba(0,0,0,.18); }
+.tn2 .tn-match-you{ border-color:#2f9e54; box-shadow:0 3px 0 #1f6c3a; }
+.tn2 .tn-row{ display:flex; align-items:center; gap:9px; padding:9px 11px; font-family:var(--display); font-size:15px; color:var(--ink); }
+.tn2 .tn-row + .tn-row{ border-top:1px solid rgba(0,0,0,.12); }
+.tn2 .tn-row .mk-av{ width:25px; height:25px; font-size:13px; }
+/* ellipsis op de naamcel: lange crewnamen blazen de kaart niet meer op */
+.tn2 .tn-row span:nth-child(2){ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tn2 .tn-win{ background:rgba(47,158,84,.16); }
+.tn2 .tn-win.tn-row{ color:#1f6c3a; }
+.tn2 .tn-lose{ background:rgba(207,58,58,.13); }
+.tn2 .tn-lose.tn-row{ color:#9a2b2b; }
+.tn2 .tn-you span:nth-child(2){ text-decoration:underline; }
+.tn2 .tn-tick{ color:#2f9e54; font-size:15px; }
+.tn2 .tn-cross{ color:#cf3a3a; font-size:15px; }
+.tn2 .tn-champ{ display:flex; align-items:center; gap:9px; font-family:var(--display); font-size:17px; color:var(--ink);
+  background:linear-gradient(180deg,var(--gold-hi),var(--gold)); border:2px solid var(--gold-d); border-radius:12px; padding:11px 13px; box-shadow:0 3px 0 var(--gold-d); }
+.tn2 .tn-champ .mk-av{ width:28px; height:28px; }
+
+/* footer: actieknop staat altijd onderaan op het scherm (SP; MP is read-only) */
+.tn2 .tn-actions{ flex:0 0 auto; margin-top:10px; text-align:center; }
+
+/* MP read-only states binnen de shell */
+.tn2 .wl-err{ flex:0 0 auto; }
+.tn2 .wl-soft{ flex:0 0 auto; }
+
+/* ---- responsive (container-queries op .tn2-in) ---- */
+@container (min-width:600px){
+  .tn2 .tn-bracket{ align-items:stretch; justify-content:safe center; }   /* breed: piramide, gecentreerd */
+}
+@container (max-width:599px){
+  .tn2 .tn-bracket{ scroll-snap-type:x mandatory; gap:11px; }              /* smal: snap-carousel + peek */
+  .tn2 .tn-col{ scroll-snap-align:center; min-width:min(78cqi,300px); }
+}
+@container (max-width:400px){
+  .tn2 .tn-bracket{ gap:9px; }
+  .tn2 .tn-col{ min-width:min(82cqi,300px); }
+  .tn2 .tn-row{ font-size:14px; padding:8px 10px; }
+  .tn2 .tn-banner{ font-size:15px; padding:8px 13px; }
+  .tn2 .md-title{ font-size:21px; }
+}
 
 /* ====================================================================
    Inbox / fight report / victory / tournament losers  (v14)
@@ -785,10 +834,7 @@ body[data-screen="screen-battle"] .app{ max-width:720px; }
   box-shadow:0 3px 0 #7a3a22; margin-left:6px; }
 .mk-rowbtn.is-cancel:active{ transform:translateY(2px); box-shadow:0 1px 0 #7a3a22; }
 
-/* tournament losers (red, mirroring the green winners) */
-.tn-lose{ background:rgba(207,58,58,.13); }
-.tn-lose.tn-row{ color:#9a2b2b; }
-.tn-cross{ color:#cf3a3a; font-size:16px; }
+/* tournament losers/cross -> verplaatst naar het .tn2-blok (v26) */
 
 /* victory popup */
 .vc-wrap{ text-align:center; padding:6px 4px 2px; }
@@ -1070,38 +1116,10 @@ body{ min-height:100dvh; }
 }
 
 /* ====================================================================
-   styles.css — battle: dode code eruit + responsive fix  (v17)
-   3 kleine zoek/vervang-edits + 1 toe te voegen blok. Geen dubbele
-   selectors: de naam-afkapping gaat IN de bestaande .bt-nm regel.
+   Battle — verticale vulling op normale/hoge schermen  (v17)
+   Korte landscape (<=600px hoog) blijft ongemoeid. Dode .bt-clock/
+   .bt-min-mark zijn in het v9-blok opgeruimd; naam-afkapping zit in .bt-nm.
    ==================================================================== */
-
-
-/* ---- EDIT 1 — verwijder de dode klok-CSS (frame gebruikt .bt-live, niet .bt-clock) ----
-   ZOEK deze twee regels (in het "Battle broadcast (v9)" blok) en VERWIJDER ze: */
-
-.bt-clock{ flex:0 0 auto; background:#0d2f40; border:2px solid #e7b94a; border-radius:12px; padding:6px 14px;
-           font-family:var(--display); font-size:30px; color:#e7b94a; min-width:78px; text-align:center; box-shadow:0 0 14px rgba(231,185,74,.25); }
-.bt-min-mark{ font-size:18px; margin-left:1px; }
-
-
-/* ---- EDIT 2 — vouw de naam-afkapping IN de bestaande .bt-nm (geen tweede regel) ----
-   ZOEK: */
-.bt-nm{ font-family:var(--display); font-size:20px; color:var(--parch); text-shadow:0 2px 0 rgba(0,0,0,.3); line-height:1.05; }
-/* VERVANG door: */
-.bt-nm{ font-family:var(--display); font-size:20px; color:var(--parch); text-shadow:0 2px 0 rgba(0,0,0,.3); line-height:1.05;
-        min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-
-
-/* ---- EDIT 3 — haal de dode .bt-clock uit de mobiele media-query ----
-   ZOEK: */
-@media (max-width:560px){ .bt-nm{ font-size:16px; } .bt-line{ font-size:18px; } .bt-clock{ font-size:24px; min-width:64px; } }
-/* VERVANG door: */
-@media (max-width:560px){ .bt-nm{ font-size:16px; } .bt-line{ font-size:18px; } }
-
-
-/* ---- EDIT 4 — voeg dit blok toe, direct ONDER de regel  #bt-speed.on{ ... } ---- */
-
-/* battle: verticale vulling op normale/hoge schermen (korte landscape blijft ongemoeid) */
 @media (min-height:601px){
   body[data-screen="screen-battle"] .app{
     display:flex; flex-direction:column; min-height:100dvh;

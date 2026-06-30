@@ -44,18 +44,6 @@
 .cp-title{ font-family:'Bangers',sans-serif; font-size:21px; color:#f1e2be; letter-spacing:.5px; line-height:1; }
 .cp-subt{ font-family:'Spectral',serif; font-size:11px; color:#cfe0d8; }
 
-.cp-tbl{ background:#f1e2be; border:2px solid #8a5a2b; border-radius:11px; overflow:hidden; }
-.cp-tr{ display:grid; grid-template-columns:24px 1fr 30px 38px; align-items:center; gap:8px; padding:8px 10px; border-bottom:1px solid rgba(138,90,43,.2); }
-.cp-tr:last-child{ border-bottom:none; }
-.cp-tr.cp-hd{ background:#e9d6a8; }
-.cp-tr.cp-hd > div{ font-family:'Spectral',serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.4px; color:#6b4a26; }
-.cp-tr.me{ background:linear-gradient(180deg,#f8e6b0,#efd488); }
-.cp-pos{ font-family:'Bangers',sans-serif; font-size:15px; color:#6b4a26; text-align:center; }
-.cp-cr{ font-family:'Spectral',serif; font-size:13px; font-weight:600; color:#3a2708; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.cp-crp{ font-family:'Spectral',serif; font-size:10px; color:#6b4a26; }
-.cp-c{ font-family:'Spectral',serif; font-size:11px; color:#6b4a26; text-align:center; }
-.cp-pt{ font-family:'Bangers',sans-serif; font-size:16px; color:#3a2708; text-align:center; }
-
 .cp-fx{ display:flex; align-items:center; gap:8px; background:#f1e2be; border:2px solid #8a5a2b; border-radius:11px; padding:9px 11px; margin-bottom:8px; }
 .cp-side{ flex:1; font-family:'Spectral',serif; font-size:13px; font-weight:600; color:#3a2708; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .cp-side.r{ text-align:right; }

@@ -4,8 +4,10 @@
    Crew Manager — mp-tournament.js
    Read-only Grand Tournament bracket. The server resolves the whole
    bracket at day 30 and stores it on World.bracket; this just renders it,
-   reusing the single-player .tn-* styling. Renders into #cp-content.
-   window.cmOpenTournament(worldId) — back returns to the league home.
+   reusing the single-player .tn-* styling, now wrapped in the .tn2 shell
+   (100dvh: fixed header + scrolling bracket; same pattern as .lg2).
+   Renders into #cp-content. window.cmOpenTournament(worldId) — back
+   returns to the league home.
    Depends on: Api, colorFor / initial / escapeHtml.
    ==================================================================== */
 
@@ -13,6 +15,7 @@
   function el(id){ return document.getElementById(id); }
   function esc(s){ return (typeof escapeHtml === "function") ? escapeHtml(s) : String(s == null ? "" : s); }
   function content(){ return el("cp-content"); }
+  function shell(inner){ return '<div class="tn2 tn2-mp"><div class="tn2-in">' + inner + '</div></div>'; }
   function activateScreen(id){
     try { if (typeof showScreen === "function") showScreen(id); } catch (e) {}
     var t = el(id);
@@ -45,18 +48,18 @@
   window.cmOpenTournament = async function (worldId){
     V.id = worldId || V.id;
     activateScreen("screen-competition");
-    content().innerHTML = head("Loading\u2026");
+    content().innerHTML = shell(head("Loading\u2026"));
 
     var league = null;
     try { league = await Api.getLeague(V.id); }
-    catch (e){ content().innerHTML = head("") + '<div class="wl-err">' + esc(e.message) + '</div>'; wireBack(); return; }
+    catch (e){ content().innerHTML = shell(head("") + '<div class="wl-err">' + esc(e.message) + '</div>'); wireBack(); return; }
 
     try { var sq = await Api.getSquad(V.id); V.mine = sq ? sq.crewName : null; } catch (e){ V.mine = null; }
 
     var b = league.bracket;
     if (!b || !b.rounds || !b.rounds.length){
-      content().innerHTML = head("") +
-        '<div class="wl-soft" style="margin-top:14px">The Grand Tournament hasn\u2019t been played yet. It happens on the final day, when the top 8 crews fight for the treasure.</div>';
+      content().innerHTML = shell(head("") +
+        '<div class="wl-soft" style="margin-top:14px">The Grand Tournament hasn\u2019t been played yet. It happens on the final day, when the top 8 crews fight for the treasure.</div>');
       wireBack();
       return;
     }
@@ -99,10 +102,10 @@
       ? '<div class="tn-banner tn-banner-win">Your crew are the Kings of the Pirates!</div>'
       : '<div class="tn-banner">' + (champ ? esc(champ) + ' won the Grand Tournament.' : 'The bracket is set.') + '</div>';
 
-    content().innerHTML =
+    content().innerHTML = shell(
       head("Top 8 \u00b7 single elimination") +
       banner +
-      '<div class="tn-bracket">' + cols + '</div>';
+      '<div class="tn-bracket">' + cols + '</div>');
     wireBack();
   }
 })();
